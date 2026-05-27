@@ -4,7 +4,6 @@ import {
   FileDown, RotateCcw, Calendar, Package
 } from 'lucide-react'
 import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
 import { toast } from 'sonner'
 import { Header } from '@/components/layout/Header'
 import { Button } from '@/components/ui/button'
@@ -32,35 +31,35 @@ export default function CaseDetailPage() {
   const navigate = useNavigate()
 
   const { data: case_, isLoading } = useCase(id)
-  const deleteCase = useDeleteCase()
+  const deleteCase  = useDeleteCase()
   const resolveCase = useResolveCase()
-  const updateCase = useUpdateCase()
+  const updateCase  = useUpdateCase()
 
   const handleDelete = async () => {
     try {
       await deleteCase.mutateAsync(id!)
-      toast.success('Caso apagado')
+      toast.success('Case deleted')
       navigate('/', { replace: true })
     } catch {
-      toast.error('Erro ao apagar caso')
+      toast.error('Error deleting case')
     }
   }
 
   const handleResolve = async () => {
     try {
       await resolveCase.mutateAsync(id!)
-      toast.success('Caso resolvido! ✅')
+      toast.success('Case resolved! ✅')
     } catch {
-      toast.error('Erro ao resolver caso')
+      toast.error('Error resolving case')
     }
   }
 
   const handleReopen = async () => {
     try {
       await updateCase.mutateAsync({ id: id!, status: 'open', resolved_at: null })
-      toast.success('Caso reaberto')
+      toast.success('Case reopened')
     } catch {
-      toast.error('Erro ao reabrir caso')
+      toast.error('Error reopening case')
     }
   }
 
@@ -68,16 +67,16 @@ export default function CaseDetailPage() {
     if (!case_) return
     try {
       generateAssistancePDF(case_)
-      toast.success('PDF baixado!')
+      toast.success('PDF downloaded!')
     } catch {
-      toast.error('Erro ao gerar PDF')
+      toast.error('Error generating PDF')
     }
   }
 
   if (isLoading) {
     return (
       <>
-        <Header title="Carregando..." showBack />
+        <Header title="Loading..." showBack />
         <div className="px-4 py-4 space-y-4">
           <Skeleton className="h-32 rounded-xl" />
           <Skeleton className="h-24 rounded-xl" />
@@ -90,11 +89,11 @@ export default function CaseDetailPage() {
   if (!case_) {
     return (
       <>
-        <Header title="Caso não encontrado" showBack />
+        <Header title="Case not found" showBack />
         <div className="text-center py-16">
-          <p className="text-gray-500">Caso não encontrado ou foi apagado.</p>
+          <p className="text-gray-500">This case was not found or has been deleted.</p>
           <Button variant="ghost" className="mt-4" onClick={() => navigate('/')}>
-            Voltar ao início
+            Back to home
           </Button>
         </div>
       </>
@@ -120,7 +119,7 @@ export default function CaseDetailPage() {
         }
       />
 
-      <div className="px-4 py-4 space-y-4 pb-8">
+      <div className="px-4 py-4 space-y-4 pb-10">
         {/* Status + category badges */}
         <div className="flex items-center gap-2 flex-wrap">
           <CategoryBadge category={case_.category} />
@@ -128,33 +127,26 @@ export default function CaseDetailPage() {
           {isResolved && (
             <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 border border-green-200 text-xs px-2.5 py-0.5 rounded-full font-medium">
               <CheckCircle2 className="w-3 h-3" />
-              Resolvido
+              Resolved
             </span>
           )}
         </div>
 
         {/* Main info card */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm divide-y divide-gray-50">
-          {/* Client section */}
+          {/* Client */}
           <div className="p-4 space-y-2.5">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Cliente</p>
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Client</p>
             <div className="space-y-2">
               <p className="font-semibold text-gray-900">{case_.client_name}</p>
-
               {case_.client_phone && (
-                <a
-                  href={`tel:${case_.client_phone}`}
-                  className="flex items-center gap-2 text-blue-600 hover:underline text-sm"
-                >
+                <a href={`tel:${case_.client_phone}`} className="flex items-center gap-2 text-blue-600 hover:underline text-sm">
                   <Phone className="w-4 h-4" />
                   {case_.client_phone}
                 </a>
               )}
               {case_.client_email && (
-                <a
-                  href={`mailto:${case_.client_email}`}
-                  className="flex items-center gap-2 text-blue-600 hover:underline text-sm break-all"
-                >
+                <a href={`mailto:${case_.client_email}`} className="flex items-center gap-2 text-blue-600 hover:underline text-sm break-all">
                   <Mail className="w-4 h-4 shrink-0" />
                   {case_.client_email}
                 </a>
@@ -162,10 +154,10 @@ export default function CaseDetailPage() {
             </div>
           </div>
 
-          {/* Product section */}
+          {/* Product */}
           {(case_.product_name || case_.shopify_order) && (
             <div className="p-4 space-y-2">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Produto</p>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Product</p>
               {case_.product_name && (
                 <p className="flex items-center gap-2 text-sm text-gray-700">
                   <Package className="w-4 h-4 text-gray-400" />
@@ -173,7 +165,9 @@ export default function CaseDetailPage() {
                 </p>
               )}
               {case_.shopify_order && (
-                <p className="text-sm text-gray-600">Pedido: <span className="font-medium">#{case_.shopify_order}</span></p>
+                <p className="text-sm text-gray-600">
+                  Order: <span className="font-medium">#{case_.shopify_order}</span>
+                </p>
               )}
             </div>
           )}
@@ -181,7 +175,7 @@ export default function CaseDetailPage() {
           {/* Cause */}
           {case_.cause && (
             <div className="p-4 space-y-2">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Motivo do Envio</p>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Reason for Service</p>
               <p className="text-sm text-gray-700 leading-relaxed">{case_.cause}</p>
             </div>
           )}
@@ -189,28 +183,28 @@ export default function CaseDetailPage() {
           {/* Notes */}
           {case_.notes && (
             <div className="p-4 space-y-2">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Notas</p>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Notes</p>
               <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{case_.notes}</p>
             </div>
           )}
 
           {/* Dates */}
           <div className="p-4 space-y-1.5">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Datas</p>
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Dates</p>
             <div className="flex items-center gap-2 text-xs text-gray-500">
               <Calendar className="w-3.5 h-3.5" />
-              Criado em: {format(new Date(case_.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+              Created: {format(new Date(case_.created_at), 'MMM d, yyyy — h:mm a')}
             </div>
             {case_.resolved_at && (
               <div className="flex items-center gap-2 text-xs text-green-600">
                 <CheckCircle2 className="w-3.5 h-3.5" />
-                Resolvido em: {format(new Date(case_.resolved_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                Resolved: {format(new Date(case_.resolved_at), 'MMM d, yyyy — h:mm a')}
               </div>
             )}
           </div>
         </div>
 
-        {/* PDF button for assistance */}
+        {/* PDF button — service cases only */}
         {case_.category === 'assistance' && (
           <Button
             variant="outline"
@@ -218,7 +212,7 @@ export default function CaseDetailPage() {
             onClick={handlePDF}
           >
             <FileDown className="w-4 h-4 mr-2" />
-            Baixar Comprovante PDF
+            Download Service Receipt (PDF)
           </Button>
         )}
 
@@ -232,7 +226,7 @@ export default function CaseDetailPage() {
           <ReminderSection caseId={id!} />
         </div>
 
-        {/* Action buttons */}
+        {/* Actions */}
         <div className="space-y-2 pt-2">
           {isResolved ? (
             <Button
@@ -241,40 +235,34 @@ export default function CaseDetailPage() {
               onClick={handleReopen}
               disabled={updateCase.isPending}
             >
-              {updateCase.isPending ? (
-                <Loader2 className="w-4 h-4 animate-spin mr-2" />
-              ) : (
-                <RotateCcw className="w-4 h-4 mr-2" />
-              )}
-              Reabrir Caso
+              {updateCase.isPending
+                ? <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                : <RotateCcw className="w-4 h-4 mr-2" />}
+              Reopen Case
             </Button>
           ) : (
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
                   <CheckCircle2 className="w-4 h-4 mr-2" />
-                  Resolver Caso
+                  Mark as Resolved
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent className="max-w-sm mx-4">
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Resolver este caso?</AlertDialogTitle>
+                  <AlertDialogTitle>Resolve this case?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    O caso será movido para o arquivo. Você pode reabri-lo depois se precisar.
+                    The case will be moved to the archive. You can reopen it anytime if needed.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={handleResolve}
                     className="bg-green-600 hover:bg-green-700"
                     disabled={resolveCase.isPending}
                   >
-                    {resolveCase.isPending ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      'Resolver'
-                    )}
+                    {resolveCase.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Resolve'}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -285,24 +273,24 @@ export default function CaseDetailPage() {
             <AlertDialogTrigger asChild>
               <Button variant="ghost" className="w-full text-red-500 hover:bg-red-50 hover:text-red-600">
                 <Trash2 className="w-4 h-4 mr-2" />
-                Apagar Caso
+                Delete Case
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent className="max-w-sm mx-4">
               <AlertDialogHeader>
-                <AlertDialogTitle>Apagar este caso?</AlertDialogTitle>
+                <AlertDialogTitle>Delete this case?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Esta ação não pode ser desfeita. O histórico de ligações e lembretes também será apagado.
+                  This action cannot be undone. All call logs and reminders will also be deleted.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={handleDelete}
                   className="bg-red-600 hover:bg-red-700"
                   disabled={deleteCase.isPending}
                 >
-                  {deleteCase.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Apagar'}
+                  {deleteCase.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Delete'}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

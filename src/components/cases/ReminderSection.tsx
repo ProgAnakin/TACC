@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Bell, Plus, Trash2, Loader2, BellOff } from 'lucide-react'
 import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -24,7 +23,7 @@ export function ReminderSection({ caseId }: Props) {
 
   const handleCreate = async () => {
     if (!title.trim() || !remindAt) {
-      toast.error('Preencha o título e a data/hora do lembrete')
+      toast.error('Fill in the title and date/time')
       return
     }
 
@@ -38,18 +37,18 @@ export function ReminderSection({ caseId }: Props) {
       setTitle('')
       setRemindAt('')
       setOpen(false)
-      toast.success('Lembrete criado!')
+      toast.success('Reminder created!')
     } catch {
-      toast.error('Erro ao criar lembrete')
+      toast.error('Error creating reminder')
     }
   }
 
   const handleDelete = async (id: string) => {
     try {
       await deleteReminder.mutateAsync(id)
-      toast.success('Lembrete removido')
+      toast.success('Reminder deleted')
     } catch {
-      toast.error('Erro ao remover lembrete')
+      toast.error('Error deleting reminder')
     }
   }
 
@@ -62,7 +61,7 @@ export function ReminderSection({ caseId }: Props) {
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-gray-800 flex items-center gap-2">
           <Bell className="w-4 h-4 text-amber-500" />
-          Lembretes
+          Reminders
           {reminders.length > 0 && (
             <span className="bg-amber-100 text-amber-700 text-xs px-1.5 py-0.5 rounded-full font-medium">
               {reminders.length}
@@ -76,16 +75,16 @@ export function ReminderSection({ caseId }: Props) {
           className="h-7 px-2 text-amber-600 hover:bg-amber-50"
         >
           <Plus className="w-4 h-4 mr-1" />
-          Novo
+          Add
         </Button>
       </div>
 
       {isLoading ? (
-        <p className="text-sm text-gray-400 text-center py-2">Carregando...</p>
+        <p className="text-sm text-gray-400 text-center py-2">Loading...</p>
       ) : reminders.length === 0 ? (
         <p className="text-sm text-gray-400 text-center py-3 flex items-center justify-center gap-2">
           <BellOff className="w-4 h-4" />
-          Nenhum lembrete criado
+          No reminders set
         </p>
       ) : (
         <div className="space-y-2">
@@ -95,9 +94,7 @@ export function ReminderSection({ caseId }: Props) {
               <div
                 key={reminder.id}
                 className={`flex items-start gap-2 p-2.5 rounded-lg ${
-                  reminder.sent || isPast
-                    ? 'bg-gray-50 opacity-60'
-                    : 'bg-amber-50 border border-amber-100'
+                  reminder.sent || isPast ? 'bg-gray-50 opacity-60' : 'bg-amber-50 border border-amber-100'
                 }`}
               >
                 <div
@@ -105,19 +102,15 @@ export function ReminderSection({ caseId }: Props) {
                     reminder.sent || isPast ? 'bg-gray-200' : 'bg-amber-100'
                   }`}
                 >
-                  <Bell
-                    className={`w-3.5 h-3.5 ${
-                      reminder.sent || isPast ? 'text-gray-400' : 'text-amber-600'
-                    }`}
-                  />
+                  <Bell className={`w-3.5 h-3.5 ${reminder.sent || isPast ? 'text-gray-400' : 'text-amber-600'}`} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-800 leading-tight">{reminder.title}</p>
                   <p className="text-xs text-gray-500 mt-0.5">
-                    {format(new Date(reminder.remind_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                    {format(new Date(reminder.remind_at), 'MMM d, yyyy — h:mm a')}
                   </p>
                   {(reminder.sent || isPast) && (
-                    <p className="text-xs text-gray-400 mt-0.5">Enviado</p>
+                    <p className="text-xs text-gray-400 mt-0.5">Sent</p>
                   )}
                 </div>
                 <button
@@ -138,21 +131,21 @@ export function ReminderSection({ caseId }: Props) {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Bell className="w-4 h-4 text-amber-500" />
-              Novo Lembrete
+              New Reminder
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="reminder-title">Descrição</Label>
+              <Label htmlFor="reminder-title">Description</Label>
               <Input
                 id="reminder-title"
-                placeholder="Ex: Ligar para confirmar retirada"
+                placeholder="e.g. Call to confirm pickup"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="reminder-datetime">Data e Hora</Label>
+              <Label htmlFor="reminder-datetime">Date & Time</Label>
               <Input
                 id="reminder-datetime"
                 type="datetime-local"
@@ -163,15 +156,9 @@ export function ReminderSection({ caseId }: Props) {
             </div>
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="ghost" onClick={() => setOpen(false)}>
-              Cancelar
-            </Button>
+            <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
             <Button onClick={handleCreate} disabled={createReminder.isPending}>
-              {createReminder.isPending ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                'Criar Lembrete'
-              )}
+              {createReminder.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Create Reminder'}
             </Button>
           </DialogFooter>
         </DialogContent>

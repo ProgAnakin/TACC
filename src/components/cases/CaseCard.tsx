@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Phone, Mail, Clock, PhoneCall } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
 import { cn } from '@/lib/utils'
 import type { Case } from '@/types'
 import { CategoryBadge } from './CategoryBadge'
@@ -13,10 +12,7 @@ interface Props {
 }
 
 export function CaseCard({ case_, className }: Props) {
-  const daysOpen = formatDistanceToNow(new Date(case_.created_at), {
-    locale: ptBR,
-    addSuffix: false,
-  })
+  const timeOpen = formatDistanceToNow(new Date(case_.created_at), { addSuffix: false })
 
   return (
     <Link
@@ -47,12 +43,12 @@ export function CaseCard({ case_, className }: Props) {
         <div className="flex items-center gap-3 text-xs text-gray-400 mt-2">
           <span className="flex items-center gap-1">
             <Clock className="w-3 h-3" />
-            {daysOpen}
+            {timeOpen}
           </span>
           {case_.call_count > 0 && (
             <span className="flex items-center gap-1 text-blue-500">
               <PhoneCall className="w-3 h-3" />
-              {case_.call_count} {case_.call_count === 1 ? 'ligação' : 'ligações'}
+              {case_.call_count} {case_.call_count === 1 ? 'call' : 'calls'}
             </span>
           )}
           {case_.shopify_order && (

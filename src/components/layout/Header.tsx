@@ -15,12 +15,12 @@ export function Header({ title, showBack = false, rightElement }: Props) {
 
   const handleSignOut = async () => {
     await signOut()
-    toast.success('Até logo!')
+    toast.success('Signed out!')
     navigate('/login')
   }
 
   return (
-    <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-sm border-b border-gray-100 safe-area-pt">
+    <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-sm border-b border-gray-100">
       <div className="flex items-center justify-between px-4 h-14 max-w-lg mx-auto">
         <div className="flex items-center gap-2">
           {showBack ? (
@@ -31,10 +31,8 @@ export function Header({ title, showBack = false, rightElement }: Props) {
               <ChevronLeft className="w-5 h-5 text-gray-700" />
             </button>
           ) : (
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center">
-                <BookOpen className="w-4 h-4 text-white" />
-              </div>
+            <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center">
+              <BookOpen className="w-4 h-4 text-white" />
             </div>
           )}
           <h1 className="font-semibold text-gray-900 text-[15px]">{title}</h1>
@@ -46,7 +44,7 @@ export function Header({ title, showBack = false, rightElement }: Props) {
             <button
               onClick={handleSignOut}
               className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
-              title="Sair"
+              title="Sign out"
             >
               <LogOut className="w-4 h-4" />
             </button>

@@ -22,50 +22,40 @@ const CATEGORY_CARDS: {
   emoji: string
   label: string
   description: string
-  border: string
   activeBg: string
-  activeText: string
   inactiveBg: string
 }[] = [
   {
     value: 'arrival',
     emoji: '📦',
-    label: 'Aviso de Chegada',
-    description: 'Cliente pediu pra ser avisado quando o produto chegar',
-    border: 'border-blue-300',
-    activeBg: 'bg-blue-600',
-    activeText: 'text-white',
-    inactiveBg: 'bg-blue-50 hover:bg-blue-100 border-blue-200',
+    label: 'Arrival Alert',
+    description: 'Client wants to be notified when the product arrives',
+    activeBg:   'bg-blue-600 border-transparent text-white shadow-md',
+    inactiveBg: 'bg-blue-50 hover:bg-blue-100 border-blue-200 text-gray-700',
   },
   {
     value: 'assistance',
     emoji: '🛠️',
-    label: 'Assistência',
-    description: 'Produto em reparo, transferência ou ajuste técnico',
-    border: 'border-orange-300',
-    activeBg: 'bg-orange-500',
-    activeText: 'text-white',
-    inactiveBg: 'bg-orange-50 hover:bg-orange-100 border-orange-200',
+    label: 'Service / Repair',
+    description: 'Product sent for repair, transfer or technical adjustment',
+    activeBg:   'bg-orange-500 border-transparent text-white shadow-md',
+    inactiveBg: 'bg-orange-50 hover:bg-orange-100 border-orange-200 text-gray-700',
   },
   {
     value: 'lead',
     emoji: '🎯',
-    label: 'Lead / Interesse',
-    description: 'Cliente interessado — alvo de follow-up com desconto ou promo',
-    border: 'border-purple-300',
-    activeBg: 'bg-purple-600',
-    activeText: 'text-white',
-    inactiveBg: 'bg-purple-50 hover:bg-purple-100 border-purple-200',
+    label: 'Lead / Interest',
+    description: 'Interested client — target for follow-up with discount or promo',
+    activeBg:   'bg-purple-600 border-transparent text-white shadow-md',
+    inactiveBg: 'bg-purple-50 hover:bg-purple-100 border-purple-200 text-gray-700',
   },
   {
     value: 'problem',
     emoji: '🚨',
-    label: 'Perrengue',
-    description: 'Problema herdado que você assumiu — requer atenção urgente',
-    border: 'border-red-300',
-    activeBg: 'bg-red-600',
-    activeText: 'text-white',
-    inactiveBg: 'bg-red-50 hover:bg-red-100 border-red-200',
+    label: 'Inherited Problem',
+    description: 'Issue you took over that needs immediate attention',
+    activeBg:   'bg-red-600 border-transparent text-white shadow-md',
+    inactiveBg: 'bg-red-50 hover:bg-red-100 border-red-200 text-gray-700',
   },
 ]
 
@@ -73,15 +63,15 @@ const CATEGORY_CARDS: {
 /*  Form schema                                                        */
 /* ------------------------------------------------------------------ */
 const schema = z.object({
-  client_name:    z.string().min(2, 'Nome obrigatório (mín. 2 caracteres)'),
-  client_phone:   z.string().optional().or(z.literal('')),
-  client_email:   z.string().email('E-mail inválido').optional().or(z.literal('')),
-  shopify_order:  z.string().optional().or(z.literal('')),
-  product_name:   z.string().optional().or(z.literal('')),
-  category:       z.enum(['arrival', 'assistance', 'lead', 'problem']),
-  urgency:        z.enum(['low', 'normal', 'high', 'critical']),
-  cause:          z.string().optional().or(z.literal('')),
-  notes:          z.string().optional().or(z.literal('')),
+  client_name:   z.string().min(2, 'Name required (min. 2 characters)'),
+  client_phone:  z.string().optional().or(z.literal('')),
+  client_email:  z.string().email('Invalid email').optional().or(z.literal('')),
+  shopify_order: z.string().optional().or(z.literal('')),
+  product_name:  z.string().optional().or(z.literal('')),
+  category:      z.enum(['arrival', 'assistance', 'lead', 'problem']),
+  urgency:       z.enum(['low', 'normal', 'high', 'critical']),
+  cause:         z.string().optional().or(z.literal('')),
+  notes:         z.string().optional().or(z.literal('')),
 })
 
 type FormData = z.infer<typeof schema>
@@ -90,9 +80,9 @@ type FormData = z.infer<typeof schema>
 /*  Component                                                          */
 /* ------------------------------------------------------------------ */
 export default function CaseFormPage() {
-  const navigate   = useNavigate()
-  const { id }     = useParams()
-  const isEditing  = !!id
+  const navigate  = useNavigate()
+  const { id }    = useParams()
+  const isEditing = !!id
 
   const { data: existingCase, isLoading: loadingCase } = useCase(id)
   const createCase = useCreateCase()
@@ -131,38 +121,38 @@ export default function CaseFormPage() {
 
   const onSubmit = async (data: FormData) => {
     const payload = {
-      client_name:    data.client_name,
-      client_phone:   data.client_phone   || null,
-      client_email:   data.client_email   || null,
-      shopify_order:  data.shopify_order  || null,
-      product_name:   data.product_name   || null,
-      category:       data.category,
-      urgency:        data.urgency,
-      cause:          data.cause  || null,
-      notes:          data.notes  || null,
-      status:         (existingCase?.status || 'open') as 'open' | 'resolved',
-      resolved_at:    existingCase?.resolved_at || null,
+      client_name:   data.client_name,
+      client_phone:  data.client_phone  || null,
+      client_email:  data.client_email  || null,
+      shopify_order: data.shopify_order || null,
+      product_name:  data.product_name  || null,
+      category:      data.category,
+      urgency:       data.urgency,
+      cause:         data.cause  || null,
+      notes:         data.notes  || null,
+      status:        (existingCase?.status || 'open') as 'open' | 'resolved',
+      resolved_at:   existingCase?.resolved_at || null,
     }
 
     try {
       if (isEditing && id) {
         await updateCase.mutateAsync({ id, ...payload })
-        toast.success('Caso atualizado!')
+        toast.success('Case updated!')
         navigate(`/cases/${id}`)
       } else {
         const newCase = await createCase.mutateAsync(payload)
-        toast.success('Caso criado! ✅')
+        toast.success('Case created! ✅')
         navigate(`/cases/${newCase.id}`)
       }
     } catch {
-      toast.error('Erro ao salvar. Verifique a conexão e tente novamente.')
+      toast.error('Error saving. Check your connection and try again.')
     }
   }
 
   if (isEditing && loadingCase) {
     return (
       <>
-        <Header title="Carregando..." showBack />
+        <Header title="Loading..." showBack />
         <div className="flex items-center justify-center py-20">
           <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
         </div>
@@ -172,14 +162,14 @@ export default function CaseFormPage() {
 
   return (
     <>
-      <Header title={isEditing ? 'Editar Caso' : 'Novo Caso'} showBack />
+      <Header title={isEditing ? 'Edit Case' : 'New Case'} showBack />
 
       <form onSubmit={handleSubmit(onSubmit)} className="px-4 py-4 space-y-6 pb-10">
 
-        {/* ── CATEGORIA ─────────────────────────────────── */}
+        {/* ── CASE TYPE ─────────────────────────────────── */}
         <div className="space-y-2">
           <Label className="text-sm font-semibold text-gray-700">
-            Tipo do caso <span className="text-red-500">*</span>
+            Case Type <span className="text-red-500">*</span>
           </Label>
           <div className="grid grid-cols-2 gap-2">
             {CATEGORY_CARDS.map((cat) => {
@@ -190,9 +180,7 @@ export default function CaseFormPage() {
                   type="button"
                   onClick={() => setValue('category', cat.value, { shouldValidate: true })}
                   className={`relative text-left rounded-xl border-2 p-3 transition-all active:scale-[0.97] ${
-                    isSelected
-                      ? `${cat.activeBg} ${cat.activeText} border-transparent shadow-md`
-                      : `${cat.inactiveBg} text-gray-700`
+                    isSelected ? cat.activeBg : cat.inactiveBg
                   }`}
                 >
                   <div className="text-2xl mb-1">{cat.emoji}</div>
@@ -211,17 +199,17 @@ export default function CaseFormPage() {
           </div>
         </div>
 
-        {/* ── URGÊNCIA ──────────────────────────────────── */}
+        {/* ── URGENCY ───────────────────────────────────── */}
         <div className="space-y-1.5">
-          <Label className="text-sm font-semibold text-gray-700">Urgência</Label>
+          <Label className="text-sm font-semibold text-gray-700">Urgency</Label>
           <div className="grid grid-cols-4 gap-1.5">
             {(Object.entries(URGENCY_LABELS) as [FormData['urgency'], string][]).map(([val, lbl]) => {
               const isSelected = watchedUrgency === val
               const colorMap: Record<string, string> = {
-                low:      isSelected ? 'bg-gray-500 text-white border-gray-500' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100',
-                normal:   isSelected ? 'bg-sky-500 text-white border-sky-500'   : 'bg-sky-50 text-sky-700 border-sky-200 hover:bg-sky-100',
-                high:     isSelected ? 'bg-amber-500 text-white border-amber-500' : 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100',
-                critical: isSelected ? 'bg-red-600 text-white border-red-600'   : 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100',
+                low:      isSelected ? 'bg-gray-500 text-white border-gray-500'     : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100',
+                normal:   isSelected ? 'bg-sky-500 text-white border-sky-500'       : 'bg-sky-50 text-sky-700 border-sky-200 hover:bg-sky-100',
+                high:     isSelected ? 'bg-amber-500 text-white border-amber-500'   : 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100',
+                critical: isSelected ? 'bg-red-600 text-white border-red-600'       : 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100',
               }
               return (
                 <button
@@ -239,20 +227,20 @@ export default function CaseFormPage() {
 
         <div className="border-t border-gray-100" />
 
-        {/* ── CLIENTE ───────────────────────────────────── */}
+        {/* ── CLIENT ────────────────────────────────────── */}
         <div className="space-y-4">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Dados do Cliente</p>
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Client Details</p>
 
           <div className="space-y-1.5">
             <Label htmlFor="client_name">
-              Nome <span className="text-red-500">*</span>
+              Name <span className="text-red-500">*</span>
             </Label>
-            <Input id="client_name" placeholder="Nome completo" {...register('client_name')} />
+            <Input id="client_name" placeholder="Full name" {...register('client_name')} />
             {errors.client_name && <p className="text-xs text-red-500">{errors.client_name.message}</p>}
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="client_phone">Telefone / WhatsApp</Label>
+            <Label htmlFor="client_phone">Phone / WhatsApp</Label>
             <Input
               id="client_phone"
               type="tel"
@@ -263,11 +251,11 @@ export default function CaseFormPage() {
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="client_email">E-mail</Label>
+            <Label htmlFor="client_email">Email</Label>
             <Input
               id="client_email"
               type="email"
-              placeholder="cliente@email.com"
+              placeholder="client@email.com"
               inputMode="email"
               {...register('client_email')}
             />
@@ -277,33 +265,33 @@ export default function CaseFormPage() {
 
         <div className="border-t border-gray-100" />
 
-        {/* ── PRODUTO ───────────────────────────────────── */}
+        {/* ── PRODUCT ───────────────────────────────────── */}
         <div className="space-y-4">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Produto</p>
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Product</p>
 
           <div className="space-y-1.5">
-            <Label htmlFor="product_name">Nome do Produto</Label>
-            <Input id="product_name" placeholder="Ex: Tênis Nike Air Max 270" {...register('product_name')} />
+            <Label htmlFor="product_name">Product Name</Label>
+            <Input id="product_name" placeholder="e.g. Nike Air Max 270" {...register('product_name')} />
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="shopify_order">Nº Pedido / Ordem</Label>
+            <Label htmlFor="shopify_order">Order # / Shopify</Label>
             <Input
               id="shopify_order"
-              placeholder="Ex: 1234"
+              placeholder="e.g. 1234"
               inputMode="numeric"
               {...register('shopify_order')}
             />
           </div>
         </div>
 
-        {/* ── MOTIVO (assistência) ──────────────────────── */}
+        {/* ── REASON (service only) ─────────────────────── */}
         {watchedCategory === 'assistance' && (
           <div className="space-y-1.5">
-            <Label htmlFor="cause">Motivo do Envio para Assistência</Label>
+            <Label htmlFor="cause">Reason for Service</Label>
             <Textarea
               id="cause"
-              placeholder="Descreva o problema ou motivo do envio para assistência..."
+              placeholder="Describe the issue or reason for sending to service..."
               rows={3}
               className="resize-none"
               {...register('cause')}
@@ -311,12 +299,12 @@ export default function CaseFormPage() {
           </div>
         )}
 
-        {/* ── NOTAS ─────────────────────────────────────── */}
+        {/* ── NOTES ─────────────────────────────────────── */}
         <div className="space-y-1.5">
-          <Label htmlFor="notes">Notas / Observações</Label>
+          <Label htmlFor="notes">Notes</Label>
           <Textarea
             id="notes"
-            placeholder="Detalhes extras, contexto importante, próximos passos..."
+            placeholder="Extra details, context, next steps..."
             rows={3}
             className="resize-none"
             {...register('notes')}
@@ -327,9 +315,9 @@ export default function CaseFormPage() {
           {isSubmitting ? (
             <Loader2 className="w-4 h-4 animate-spin" />
           ) : isEditing ? (
-            'Salvar Alterações'
+            'Save Changes'
           ) : (
-            '+ Criar Caso'
+            '+ Create Case'
           )}
         </Button>
       </form>

@@ -41,57 +41,64 @@ export interface Reminder {
 }
 
 export const CATEGORY_LABELS: Record<Category, string> = {
-  arrival: '📦 Aviso de Chegada',
-  assistance: '🛠️ Assistência',
-  lead: '🎯 Lead / Interesse',
-  problem: '🚨 Perrengue',
+  arrival:    '📦 Arrival Alert',
+  assistance: '🛠️ Service / Repair',
+  lead:       '🎯 Lead / Interest',
+  problem:    '🚨 Inherited Problem',
+}
+
+export const CATEGORY_SHORT: Record<Category, string> = {
+  arrival:    '📦 Arrival',
+  assistance: '🛠️ Service',
+  lead:       '🎯 Lead',
+  problem:    '🚨 Problem',
 }
 
 export const CATEGORY_COLORS: Record<Category, string> = {
-  arrival: 'bg-blue-100 text-blue-700 border-blue-200',
+  arrival:    'bg-blue-100 text-blue-700 border-blue-200',
   assistance: 'bg-orange-100 text-orange-700 border-orange-200',
-  lead: 'bg-purple-100 text-purple-700 border-purple-200',
-  problem: 'bg-red-100 text-red-700 border-red-200',
+  lead:       'bg-purple-100 text-purple-700 border-purple-200',
+  problem:    'bg-red-100 text-red-700 border-red-200',
 }
 
 export const CATEGORY_ICON_COLORS: Record<Category, string> = {
-  arrival: 'text-blue-600',
+  arrival:    'text-blue-600',
   assistance: 'text-orange-600',
-  lead: 'text-purple-600',
-  problem: 'text-red-600',
+  lead:       'text-purple-600',
+  problem:    'text-red-600',
 }
 
 export const CATEGORY_BG: Record<Category, string> = {
-  arrival: 'bg-blue-50 border-blue-100',
+  arrival:    'bg-blue-50 border-blue-100',
   assistance: 'bg-orange-50 border-orange-100',
-  lead: 'bg-purple-50 border-purple-100',
-  problem: 'bg-red-50 border-red-100',
+  lead:       'bg-purple-50 border-purple-100',
+  problem:    'bg-red-50 border-red-100',
 }
 
 export const URGENCY_LABELS: Record<Urgency, string> = {
-  low: 'Baixa',
-  normal: 'Normal',
-  high: 'Alta',
-  critical: 'Crítica',
+  low:      'Low',
+  normal:   'Normal',
+  high:     'High',
+  critical: 'Critical',
 }
 
 export const URGENCY_COLORS: Record<Urgency, string> = {
-  low: 'bg-gray-100 text-gray-600 border-gray-200',
-  normal: 'bg-sky-100 text-sky-700 border-sky-200',
-  high: 'bg-amber-100 text-amber-700 border-amber-200',
+  low:      'bg-gray-100 text-gray-600 border-gray-200',
+  normal:   'bg-sky-100 text-sky-700 border-sky-200',
+  high:     'bg-amber-100 text-amber-700 border-amber-200',
   critical: 'bg-red-100 text-red-700 border-red-200',
 }
 
 export const STATUS_LABELS: Record<Status, string> = {
-  open: 'Aberto',
-  resolved: 'Resolvido',
+  open:     'Open',
+  resolved: 'Resolved',
 }
 
 export type SortOption = 'newest' | 'oldest' | 'urgency' | 'name'
 
 export const SORT_LABELS: Record<SortOption, string> = {
-  newest: 'Mais recente',
-  oldest: 'Mais antigo',
-  urgency: 'Urgência',
-  name: 'Nome do cliente',
+  newest:  'Newest first',
+  oldest:  'Oldest first',
+  urgency: 'By urgency',
+  name:    'Client name',
 }
