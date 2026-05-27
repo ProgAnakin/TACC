@@ -88,6 +88,7 @@ export default function CaseFormPage() {
       cause: data.cause || null,
       notes: data.notes || null,
       status: (existingCase?.status || 'open') as 'open' | 'resolved',
+      resolved_at: existingCase?.resolved_at || null,
     }
 
     try {
