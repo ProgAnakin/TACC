@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useCase, useCreateCase, useUpdateCase } from '@/hooks/useCases'
 import { URGENCY_LABELS } from '@/types'
-import type { Category } from '@/types'
+import type { Category, ServiceStatus } from '@/types'
 
 /* ------------------------------------------------------------------ */
 /*  Category card config                                               */
@@ -70,6 +70,7 @@ const schema = z.object({
   product_name:  z.string().optional().or(z.literal('')),
   category:      z.enum(['arrival', 'assistance', 'lead', 'problem']),
   urgency:       z.enum(['low', 'normal', 'high', 'critical']),
+  expected_date: z.string().optional().or(z.literal('')),
   cause:         z.string().optional().or(z.literal('')),
   notes:         z.string().optional().or(z.literal('')),
 })
@@ -113,6 +114,7 @@ export default function CaseFormPage() {
         product_name:  existingCase.product_name  || '',
         category:      existingCase.category,
         urgency:       existingCase.urgency,
+        expected_date: existingCase.expected_date || '',
         cause:         existingCase.cause  || '',
         notes:         existingCase.notes  || '',
       })
@@ -121,17 +123,20 @@ export default function CaseFormPage() {
 
   const onSubmit = async (data: FormData) => {
     const payload = {
-      client_name:   data.client_name,
-      client_phone:  data.client_phone  || null,
-      client_email:  data.client_email  || null,
-      shopify_order: data.shopify_order || null,
-      product_name:  data.product_name  || null,
-      category:      data.category,
-      urgency:       data.urgency,
-      cause:         data.cause  || null,
-      notes:         data.notes  || null,
-      status:        (existingCase?.status || 'open') as 'open' | 'resolved',
-      resolved_at:   existingCase?.resolved_at || null,
+      client_name:     data.client_name,
+      client_phone:    data.client_phone  || null,
+      client_email:    data.client_email  || null,
+      shopify_order:   data.shopify_order || null,
+      product_name:    data.product_name  || null,
+      category:        data.category,
+      urgency:         data.urgency,
+      expected_date:   data.expected_date || null,
+      service_status:  isEditing ? (existingCase?.service_status ?? null) : null as ServiceStatus | null,
+      cause:           data.cause  || null,
+      notes:           data.notes  || null,
+      status:          (existingCase?.status || 'open') as 'open' | 'resolved',
+      resolved_at:     existingCase?.resolved_at || null,
+      last_contact_at: existingCase?.last_contact_at || null,
     }
 
     try {
@@ -285,17 +290,30 @@ export default function CaseFormPage() {
           </div>
         </div>
 
-        {/* ── REASON (service only) ─────────────────────── */}
+        {/* ── REASON + EXPECTED DATE (service only) ────── */}
         {watchedCategory === 'assistance' && (
-          <div className="space-y-1.5">
-            <Label htmlFor="cause">Reason for Service</Label>
-            <Textarea
-              id="cause"
-              placeholder="Describe the issue or reason for sending to service..."
-              rows={3}
-              className="resize-none"
-              {...register('cause')}
-            />
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="cause">Reason for Service</Label>
+              <Textarea
+                id="cause"
+                placeholder="Describe the issue or reason for sending to service..."
+                rows={3}
+                className="resize-none"
+                {...register('cause')}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="expected_date">Expected Return Date</Label>
+              <Input
+                id="expected_date"
+                type="date"
+                className="block"
+                {...register('expected_date')}
+              />
+              <p className="text-xs text-gray-400">When do you expect the item back from service?</p>
+            </div>
           </div>
         )}
 

@@ -1,6 +1,7 @@
-export type Category = 'arrival' | 'assistance' | 'lead' | 'problem'
-export type Status = 'open' | 'resolved'
-export type Urgency = 'low' | 'normal' | 'high' | 'critical'
+export type Category      = 'arrival' | 'assistance' | 'lead' | 'problem'
+export type Status        = 'open' | 'resolved'
+export type Urgency       = 'low' | 'normal' | 'high' | 'critical'
+export type ServiceStatus = 'sent' | 'evaluation' | 'in_repair' | 'ready' | 'delivered'
 
 export interface Case {
   id: string
@@ -19,6 +20,10 @@ export interface Case {
   created_at: string
   updated_at: string
   resolved_at: string | null
+  /* New fields (added via migration 002) */
+  expected_date: string | null
+  service_status: ServiceStatus | null
+  last_contact_at: string | null
 }
 
 export interface CallLog {
@@ -39,6 +44,10 @@ export interface Reminder {
   created_at: string
   case?: Case
 }
+
+/* ------------------------------------------------------------------ */
+/*  Display constants                                                  */
+/* ------------------------------------------------------------------ */
 
 export const CATEGORY_LABELS: Record<Category, string> = {
   arrival:    '📦 Arrival Alert',
@@ -92,6 +101,22 @@ export const URGENCY_COLORS: Record<Urgency, string> = {
 export const STATUS_LABELS: Record<Status, string> = {
   open:     'Open',
   resolved: 'Resolved',
+}
+
+export const SERVICE_STATUS_LABELS: Record<ServiceStatus, string> = {
+  sent:       'Sent',
+  evaluation: 'Evaluation',
+  in_repair:  'In Repair',
+  ready:      'Ready for Pickup',
+  delivered:  'Delivered',
+}
+
+export const SERVICE_STATUS_COLORS: Record<ServiceStatus, string> = {
+  sent:       'bg-gray-100 text-gray-600',
+  evaluation: 'bg-blue-100 text-blue-700',
+  in_repair:  'bg-orange-100 text-orange-700',
+  ready:      'bg-green-100 text-green-700',
+  delivered:  'bg-gray-100 text-gray-500',
 }
 
 export type SortOption = 'newest' | 'oldest' | 'urgency' | 'name'
