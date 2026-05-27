@@ -1,13 +1,19 @@
 import { useState } from 'react'
-import { BookOpen, Loader2, Eye, EyeOff } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { BookOpen, Loader2, Eye, EyeOff, AlertTriangle } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/hooks/useAuth'
 
+const supabaseConfigured =
+  import.meta.env.VITE_SUPABASE_URL &&
+  import.meta.env.VITE_SUPABASE_URL !== 'https://placeholder.supabase.co'
+
 export default function LoginPage() {
   const { signIn, signUp } = useAuth()
+  const navigate = useNavigate()
   const [mode, setMode] = useState<'login' | 'signup'>('login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -16,6 +22,10 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!supabaseConfigured) {
+      toast.error('Supabase não configurado — adicione VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY nas variáveis de ambiente da Vercel.')
+      return
+    }
     if (!email.trim() || !password.trim()) {
       toast.error('Preencha e-mail e senha')
       return
@@ -32,20 +42,27 @@ export default function LoginPage() {
         if (error) {
           if (error.message.includes('Invalid login credentials')) {
             toast.error('E-mail ou senha incorretos')
-          } else {
-            toast.error(error.message)
-          }
-        }
-      } else {
-        const { error } = await signUp(email, password)
-        if (error) {
-          if (error.message.includes('already registered')) {
-            toast.error('Este e-mail já está cadastrado')
+          } else if (error.message.includes('Email not confirmed')) {
+            toast.error('E-mail não confirmado. Verifique sua caixa de entrada ou desative a confirmação no Supabase → Authentication → Settings.')
           } else {
             toast.error(error.message)
           }
         } else {
-          toast.success('Conta criada! Verifique seu e-mail.')
+          navigate('/', { replace: true })
+        }
+      } else {
+        const { data, error } = await signUp(email, password)
+        if (error) {
+          if (error.message.includes('already registered')) {
+            toast.error('Este e-mail já está cadastrado. Tente entrar.')
+          } else {
+            toast.error(error.message)
+          }
+        } else if (data.session) {
+          // Email confirmation disabled — logged in immediately
+          navigate('/', { replace: true })
+        } else {
+          toast.success('Conta criada! Verifique seu e-mail para ativar.')
         }
       }
     } finally {
@@ -63,6 +80,17 @@ export default function LoginPage() {
         <h1 className="text-2xl font-bold text-gray-900">Caderninho Digital</h1>
         <p className="text-gray-500 text-sm mt-1">CRM pessoal para o dia a dia da loja</p>
       </div>
+
+      {/* Supabase config warning */}
+      {!supabaseConfigured && (
+        <div className="w-full max-w-sm mb-4 flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
+          <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
+          <div>
+            <p className="font-semibold">Supabase não configurado</p>
+            <p className="mt-0.5">Adicione <code className="bg-amber-100 px-1 rounded">VITE_SUPABASE_URL</code> e <code className="bg-amber-100 px-1 rounded">VITE_SUPABASE_ANON_KEY</code> nas variáveis de ambiente da Vercel e faça redeploy.</p>
+          </div>
+        </div>
+      )}
 
       {/* Card */}
       <div className="w-full max-w-sm bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
