@@ -19,11 +19,22 @@ export function ReminderSection({ caseId }: Props) {
   const deleteReminder = useDeleteReminder()
   const [open, setOpen] = useState(false)
   const [title, setTitle] = useState('')
-  const [remindAt, setRemindAt] = useState('')
+  const [date, setDate] = useState('')
+  const [time, setTime] = useState('09:00')
 
   const handleCreate = async () => {
-    if (!title.trim() || !remindAt) {
-      toast.error('Fill in the title and date/time')
+    if (!title.trim()) {
+      toast.error('Please add a description')
+      return
+    }
+    if (!date) {
+      toast.error('Please pick a date')
+      return
+    }
+
+    const remindAt = new Date(`${date}T${time || '09:00'}:00`).toISOString()
+    if (new Date(remindAt) < new Date()) {
+      toast.error('Date/time must be in the future')
       return
     }
 
@@ -35,7 +46,8 @@ export function ReminderSection({ caseId }: Props) {
     try {
       await createReminder.mutateAsync({ caseId, title: title.trim(), remindAt })
       setTitle('')
-      setRemindAt('')
+      setDate('')
+      setTime('09:00')
       setOpen(false)
       toast.success('Reminder created!')
     } catch {
@@ -52,9 +64,7 @@ export function ReminderSection({ caseId }: Props) {
     }
   }
 
-  const minDateTime = new Date()
-  minDateTime.setMinutes(minDateTime.getMinutes() + 5)
-  const minDateTimeStr = minDateTime.toISOString().slice(0, 16)
+  const today = new Date().toISOString().slice(0, 10)
 
   return (
     <div className="space-y-3">
@@ -144,15 +154,26 @@ export function ReminderSection({ caseId }: Props) {
                 onChange={(e) => setTitle(e.target.value)}
               />
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="reminder-datetime">Date & Time</Label>
-              <Input
-                id="reminder-datetime"
-                type="datetime-local"
-                min={minDateTimeStr}
-                value={remindAt}
-                onChange={(e) => setRemindAt(e.target.value)}
-              />
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="reminder-date">Date</Label>
+                <Input
+                  id="reminder-date"
+                  type="date"
+                  min={today}
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="reminder-time">Time</Label>
+                <Input
+                  id="reminder-time"
+                  type="time"
+                  value={time}
+                  onChange={(e) => setTime(e.target.value)}
+                />
+              </div>
             </div>
           </div>
           <DialogFooter className="gap-2">

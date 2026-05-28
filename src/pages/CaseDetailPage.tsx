@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   Phone, Mail, Edit3, Trash2, CheckCircle2, Loader2,
@@ -19,9 +20,12 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
+import {
+  Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle,
+} from '@/components/ui/dialog'
 import { useCase, useDeleteCase, useResolveCase, useUpdateCase } from '@/hooks/useCases'
 import { useCreateReminder } from '@/hooks/useReminders'
-import { generateAssistancePDF } from '@/lib/pdf'
+import { generateAssistancePDF, type PdfLocale } from '@/lib/pdf'
 import { buildWhatsAppUrl } from '@/lib/utils'
 import type { ServiceStatus } from '@/types'
 
@@ -42,6 +46,7 @@ export default function CaseDetailPage() {
   const resolveCase     = useResolveCase()
   const updateCase      = useUpdateCase()
   const createReminder  = useCreateReminder()
+  const [pdfDialogOpen, setPdfDialogOpen] = useState(false)
 
   const handleDelete = async () => {
     try {
@@ -75,8 +80,14 @@ export default function CaseDetailPage() {
     try {
       await updateCase.mutateAsync({ id: id!, service_status: status })
       toast.success(`Status updated → ${status.replace('_', ' ')}`)
-    } catch {
-      toast.error('Error updating status')
+    } catch (err: any) {
+      const msg = err?.message || String(err)
+      if (msg.toLowerCase().includes('service_status') || msg.toLowerCase().includes('column')) {
+        toast.error('Database not migrated — run supabase/migrations/002_service_fields.sql', { duration: 6000 })
+      } else {
+        toast.error(`Error updating status: ${msg}`)
+      }
+      console.error('Service status update failed:', err)
     }
   }
 
@@ -95,10 +106,11 @@ export default function CaseDetailPage() {
     }
   }
 
-  const handlePDF = () => {
+  const handlePDF = (locale: PdfLocale) => {
     if (!case_) return
     try {
-      generateAssistancePDF(case_)
+      generateAssistancePDF(case_, locale)
+      setPdfDialogOpen(false)
       toast.success('PDF downloaded!')
     } catch {
       toast.error('Error generating PDF')
@@ -320,9 +332,61 @@ export default function CaseDetailPage() {
 
         {/* PDF — service cases only */}
         {case_.category === 'assistance' && (
-          <Button variant="outline" className="w-full border-indigo-200 text-indigo-700 hover:bg-indigo-50" onClick={handlePDF}>
-            <FileDown className="w-4 h-4 mr-2" /> Download Service Receipt (PDF)
-          </Button>
+          <>
+            <Button
+              variant="outline"
+              className="w-full border-indigo-200 text-indigo-700 hover:bg-indigo-50"
+              onClick={() => setPdfDialogOpen(true)}
+            >
+              <FileDown className="w-4 h-4 mr-2" /> Download Service Receipt (PDF)
+            </Button>
+
+            <Dialog open={pdfDialogOpen} onOpenChange={setPdfDialogOpen}>
+              <DialogContent className="max-w-sm mx-4">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <FileDown className="w-4 h-4 text-indigo-600" />
+                    Choose PDF Language
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="grid grid-cols-1 gap-2 py-2">
+                  <button
+                    onClick={() => handlePDF('en')}
+                    className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-indigo-50 hover:border-indigo-300 transition-colors text-left"
+                  >
+                    <span className="text-2xl">🇬🇧</span>
+                    <div>
+                      <p className="font-semibold text-sm">English</p>
+                      <p className="text-xs text-gray-500">Technical Service Receipt</p>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => handlePDF('it')}
+                    className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-indigo-50 hover:border-indigo-300 transition-colors text-left"
+                  >
+                    <span className="text-2xl">🇮🇹</span>
+                    <div>
+                      <p className="font-semibold text-sm">Italiano</p>
+                      <p className="text-xs text-gray-500">Ricevuta di Assistenza Tecnica</p>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => handlePDF('pt')}
+                    className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-indigo-50 hover:border-indigo-300 transition-colors text-left"
+                  >
+                    <span className="text-2xl">🇧🇷</span>
+                    <div>
+                      <p className="font-semibold text-sm">Português</p>
+                      <p className="text-xs text-gray-500">Comprovante de Assistência Técnica</p>
+                    </div>
+                  </button>
+                </div>
+                <DialogFooter>
+                  <Button variant="ghost" onClick={() => setPdfDialogOpen(false)}>Cancel</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </>
         )}
 
         {/* Call log */}

@@ -77,3 +77,55 @@ export function useLogCall() {
     },
   })
 }
+
+export function useUpdateCallLog() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ id, notes }: { id: string; notes: string | null; caseId: string }) => {
+      const { data, error } = await supabase
+        .from('call_logs')
+        .update({ notes })
+        .eq('id', id)
+        .select()
+        .single()
+
+      if (error) throw error
+      return data as CallLog
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['call-logs', variables.caseId] })
+    },
+  })
+}
+
+export function useDeleteCallLog() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ id, caseId }: { id: string; caseId: string }) => {
+      const { error } = await supabase.from('call_logs').delete().eq('id', id)
+      if (error) throw error
+
+      // Decrement call_count
+      const { data: caseData } = await supabase
+        .from('cases')
+        .select('call_count')
+        .eq('id', caseId)
+        .single()
+
+      await supabase
+        .from('cases')
+        .update({
+          call_count: Math.max(0, (caseData?.call_count || 1) - 1),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', caseId)
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['call-logs', variables.caseId] })
+      queryClient.invalidateQueries({ queryKey: ['case', variables.caseId] })
+      queryClient.invalidateQueries({ queryKey: ['cases'] })
+    },
+  })
+}
