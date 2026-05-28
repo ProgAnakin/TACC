@@ -94,12 +94,18 @@ export function useCase(id: string | undefined) {
   })
 }
 
+// Fields guaranteed to exist in the original schema
+type CreateCaseInput = Pick<Case,
+  'client_name' | 'client_phone' | 'client_email' | 'shopify_order' | 'product_name' |
+  'category' | 'urgency' | 'cause' | 'notes' | 'status' | 'resolved_at'
+> & Record<string, unknown>
+
 export function useCreateCase() {
   const queryClient = useQueryClient()
   const { user } = useAuth()
 
   return useMutation({
-    mutationFn: async (values: Omit<Case, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'call_count'>) => {
+    mutationFn: async (values: CreateCaseInput) => {
       if (!user) throw new Error('Not authenticated')
 
       const { data, error } = await supabase

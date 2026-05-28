@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useCase, useCreateCase, useUpdateCase } from '@/hooks/useCases'
 import { URGENCY_LABELS } from '@/types'
-import type { Category, ServiceStatus } from '@/types'
+import type { Category } from '@/types'
 
 /* ------------------------------------------------------------------ */
 /*  Category card config                                               */
@@ -122,22 +122,29 @@ export default function CaseFormPage() {
   }, [existingCase, reset])
 
   const onSubmit = async (data: FormData) => {
-    const payload = {
-      client_name:     data.client_name,
-      client_phone:    data.client_phone  || null,
-      client_email:    data.client_email  || null,
-      shopify_order:   data.shopify_order || null,
-      product_name:    data.product_name  || null,
-      category:        data.category,
-      urgency:         data.urgency,
-      expected_date:   data.expected_date || null,
-      service_status:  isEditing ? (existingCase?.service_status ?? null) : null as ServiceStatus | null,
-      cause:           data.cause  || null,
-      notes:           data.notes  || null,
-      status:          (existingCase?.status || 'open') as 'open' | 'resolved',
-      resolved_at:     existingCase?.resolved_at || null,
-      last_contact_at: existingCase?.last_contact_at || null,
+    // Base payload — columns guaranteed to exist in the original schema
+    const base = {
+      client_name:   data.client_name,
+      client_phone:  data.client_phone  || null,
+      client_email:  data.client_email  || null,
+      shopify_order: data.shopify_order || null,
+      product_name:  data.product_name  || null,
+      category:      data.category,
+      urgency:       data.urgency,
+      cause:         data.cause  || null,
+      notes:         data.notes  || null,
+      status:        (existingCase?.status || 'open') as 'open' | 'resolved',
+      resolved_at:   existingCase?.resolved_at || null,
     }
+
+    // Extra columns added in migration 002 — only include when they have a real value
+    // so the insert still works on databases that haven't run the migration yet.
+    const extras: Record<string, unknown> = {}
+    if (data.expected_date) extras.expected_date = data.expected_date
+    if (isEditing && existingCase?.service_status) extras.service_status = existingCase.service_status
+    if (isEditing && existingCase?.last_contact_at) extras.last_contact_at = existingCase.last_contact_at
+
+    const payload = { ...base, ...extras }
 
     try {
       if (isEditing && id) {
@@ -145,12 +152,18 @@ export default function CaseFormPage() {
         toast.success('Case updated!')
         navigate(`/cases/${id}`)
       } else {
-        const newCase = await createCase.mutateAsync(payload)
+        const newCase = await createCase.mutateAsync(payload as Parameters<typeof createCase.mutateAsync>[0])
         toast.success('Case created! ✅')
         navigate(`/cases/${newCase.id}`)
       }
-    } catch {
-      toast.error('Error saving. Check your connection and try again.')
+    } catch (err: unknown) {
+      const msg = (err as any)?.message || String(err)
+      if (msg.includes('column') || msg.includes('does not exist')) {
+        toast.error('DB needs migration — run 002_service_fields.sql in Supabase', { duration: 8000 })
+      } else {
+        toast.error(`Error saving: ${msg}`)
+      }
+      console.error('Case save failed:', err)
     }
   }
 
