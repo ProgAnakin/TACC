@@ -27,7 +27,8 @@ import { useCase, useDeleteCase, useResolveCase, useUpdateCase } from '@/hooks/u
 import { useCreateReminder } from '@/hooks/useReminders'
 import { generateAssistancePDF, type PdfLocale } from '@/lib/pdf'
 import { buildWhatsAppUrl } from '@/lib/utils'
-import type { ServiceStatus } from '@/types'
+import type { ServiceStatus, LeadOutcome } from '@/types'
+import { LEAD_OUTCOME_LABELS, LEAD_OUTCOME_COLORS } from '@/types'
 
 /* Quick follow-up shortcuts for Lead cases */
 function addDays(days: number): string {
@@ -47,6 +48,7 @@ export default function CaseDetailPage() {
   const updateCase      = useUpdateCase()
   const createReminder  = useCreateReminder()
   const [pdfDialogOpen, setPdfDialogOpen] = useState(false)
+  const [outcomeLoading, setOutcomeLoading] = useState<LeadOutcome | null>(null)
 
   const handleDelete = async () => {
     try {
@@ -103,6 +105,18 @@ export default function CaseDetailPage() {
       toast.success(`Reminder set for ${label}`)
     } catch {
       toast.error('Error creating reminder')
+    }
+  }
+
+  const handleLeadOutcome = async (outcome: LeadOutcome) => {
+    setOutcomeLoading(outcome)
+    try {
+      await updateCase.mutateAsync({ id: id!, lead_outcome: outcome, status: 'resolved', resolved_at: new Date().toISOString() })
+      toast.success(LEAD_OUTCOME_LABELS[outcome])
+    } catch {
+      toast.error('Error updating outcome')
+    } finally {
+      setOutcomeLoading(null)
     }
   }
 
@@ -176,6 +190,11 @@ export default function CaseDetailPage() {
               <CalendarClock className="w-3 h-3" /> Overdue
             </span>
           )}
+          {case_.lead_outcome && (
+            <span className={`inline-flex items-center gap-1 border text-xs px-2.5 py-0.5 rounded-full font-medium ${LEAD_OUTCOME_COLORS[case_.lead_outcome]}`}>
+              {LEAD_OUTCOME_LABELS[case_.lead_outcome]}
+            </span>
+          )}
         </div>
 
         {/* Primary contact actions */}
@@ -218,6 +237,24 @@ export default function CaseDetailPage() {
               onChange={isResolved ? undefined : handleServiceStatus}
               readonly={isResolved}
             />
+          </div>
+        )}
+
+        {/* Overdue service banner */}
+        {case_.category === 'assistance' && expectedPast && !isResolved && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-3.5 flex items-start gap-3">
+            <CalendarClock className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-red-700">Expected date has passed</p>
+              <p className="text-xs text-red-500 mt-0.5">The item hasn't returned yet. Follow up with service.</p>
+            </div>
+            <button
+              onClick={() => handleQuickReminder(1)}
+              disabled={createReminder.isPending}
+              className="shrink-0 bg-red-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-red-700 active:scale-95 transition-all"
+            >
+              Remind tomorrow
+            </button>
           </div>
         )}
 
@@ -406,6 +443,29 @@ export default function CaseDetailPage() {
               {updateCase.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <RotateCcw className="w-4 h-4 mr-2" />}
               Reopen Case
             </Button>
+          ) : case_.category === 'lead' ? (
+            <div className="space-y-2">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Close this lead as:</p>
+              <div className="grid grid-cols-3 gap-2">
+                {(['converted', 'lost', 'no_interest'] as LeadOutcome[]).map(outcome => {
+                  const colorMap: Record<LeadOutcome, string> = {
+                    converted:   'bg-green-600 hover:bg-green-700 text-white',
+                    lost:        'bg-red-500 hover:bg-red-600 text-white',
+                    no_interest: 'bg-gray-200 hover:bg-gray-300 text-gray-700',
+                  }
+                  return (
+                    <button
+                      key={outcome}
+                      onClick={() => handleLeadOutcome(outcome)}
+                      disabled={!!outcomeLoading}
+                      className={`py-2.5 px-2 rounded-xl text-xs font-semibold transition-all active:scale-95 ${colorMap[outcome]}`}
+                    >
+                      {outcomeLoading === outcome ? <Loader2 className="w-3.5 h-3.5 animate-spin mx-auto" /> : LEAD_OUTCOME_LABELS[outcome]}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
           ) : (
             <AlertDialog>
               <AlertDialogTrigger asChild>

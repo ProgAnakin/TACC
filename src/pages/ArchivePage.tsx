@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Search, X, Archive, RotateCcw, Loader2 } from 'lucide-react'
-import { format } from 'date-fns'
+import { format, differenceInDays } from 'date-fns'
 import { toast } from 'sonner'
 import { Link } from 'react-router-dom'
 import { Header } from '@/components/layout/Header'
@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { CategoryBadge } from '@/components/cases/CategoryBadge'
 import { useCases, useUpdateCase } from '@/hooks/useCases'
+import { LEAD_OUTCOME_LABELS, LEAD_OUTCOME_COLORS } from '@/types'
 
 export default function ArchivePage() {
   const [search, setSearch] = useState('')
@@ -17,6 +18,23 @@ export default function ArchivePage() {
     sortBy: 'newest',
   })
   const updateCase = useUpdateCase()
+
+  const insights = useMemo(() => {
+    if (!cases.length) return null
+
+    const serviceCases = cases.filter(c => c.category === 'assistance' && c.resolved_at && c.created_at)
+    const avgDays = serviceCases.length
+      ? Math.round(serviceCases.reduce((sum, c) => {
+          return sum + differenceInDays(new Date(c.resolved_at!), new Date(c.created_at))
+        }, 0) / serviceCases.length)
+      : null
+
+    const leads = cases.filter(c => c.category === 'lead')
+    const converted = leads.filter(c => c.lead_outcome === 'converted').length
+    const convRate = leads.length ? Math.round((converted / leads.length) * 100) : null
+
+    return { avgDays, convRate, leads: leads.length, converted }
+  }, [cases])
 
   const handleReopen = async (id: string, e: React.MouseEvent) => {
     e.preventDefault()
@@ -53,6 +71,27 @@ export default function ArchivePage() {
           )}
         </div>
 
+        {insights && !search && cases.length > 0 && (
+          <div className="grid grid-cols-3 gap-2">
+            <div className="bg-white rounded-xl border border-gray-100 p-3 text-center shadow-sm">
+              <div className="text-xl font-bold text-gray-700">{cases.length}</div>
+              <div className="text-xs text-gray-400 mt-0.5">Resolved</div>
+            </div>
+            <div className="bg-white rounded-xl border border-gray-100 p-3 text-center shadow-sm">
+              <div className="text-xl font-bold text-blue-600">
+                {insights.avgDays !== null ? `${insights.avgDays}d` : '—'}
+              </div>
+              <div className="text-xs text-gray-400 mt-0.5">Avg repair time</div>
+            </div>
+            <div className="bg-white rounded-xl border border-gray-100 p-3 text-center shadow-sm">
+              <div className="text-xl font-bold text-green-600">
+                {insights.convRate !== null ? `${insights.convRate}%` : '—'}
+              </div>
+              <div className="text-xs text-gray-400 mt-0.5">Lead conv.</div>
+            </div>
+          </div>
+        )}
+
         {isLoading ? (
           <div className="space-y-3">
             {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-20 rounded-xl" />)}
@@ -82,6 +121,11 @@ export default function ArchivePage() {
                   <div className="flex items-center gap-2 flex-wrap mb-1">
                     <span className="font-medium text-gray-700 text-sm">{case_.client_name}</span>
                     <CategoryBadge category={case_.category} size="sm" />
+                    {case_.lead_outcome && (
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full border font-medium ${LEAD_OUTCOME_COLORS[case_.lead_outcome]}`}>
+                        {LEAD_OUTCOME_LABELS[case_.lead_outcome]}
+                      </span>
+                    )}
                   </div>
                   {case_.product_name && (
                     <p className="text-xs text-gray-500 truncate">{case_.product_name}</p>

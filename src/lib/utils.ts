@@ -20,16 +20,32 @@ export function buildWhatsAppUrl(
   clientName: string,
   productName: string | null,
 ): string {
-  const digits  = phone.replace(/\D/g, '')
-  const withCC  = digits.startsWith('55') ? digits : `55${digits}`
-  const first   = clientName.split(' ')[0]
-  const product = productName ? ` — ${productName}` : ''
+  const digits = phone.replace(/\D/g, '')
+
+  // Italian phone number detection
+  let withCC: string
+  if (digits.startsWith('39') && digits.length === 12) {
+    // Already has Italian country code
+    withCC = digits
+  } else if (digits.length === 10 && digits.startsWith('3')) {
+    // Italian mobile (10 digits starting with 3) → prepend 39
+    withCC = `39${digits}`
+  } else if (digits.length === 11 && digits.startsWith('039')) {
+    // 039... format → convert to 39...
+    withCC = `39${digits.slice(2)}`
+  } else {
+    // User already included country code or unknown format
+    withCC = digits
+  }
+
+  const firstName = clientName.split(' ')[0]
+  const productText = productName ? ` "${productName}"` : ''
 
   const messages: Record<Category, string> = {
-    arrival:    `Olá ${first}! 📦 Seu produto${product} chegou à loja e está pronto para retirada. Quando podemos te esperar?`,
-    assistance: `Olá ${first}! 🛠️ Entrando em contato para te dar um update sobre o seu produto${product} que está em assistência.`,
-    lead:       `Olá ${first}! 🎯 Temos uma condição especial no produto${product} que você se interessou. Ainda tem interesse?`,
-    problem:    `Olá ${first}! Entrando em contato para acompanhar o caso do seu produto${product}. Podemos conversar?`,
+    arrival:    `Buongiorno ${firstName}! Ti contatto dal negozio per informarti che il prodotto${productText} è arrivato. Quando puoi passare a ritirarlo?`,
+    assistance: `Buongiorno ${firstName}! Ti contatto riguardo al prodotto${productText} in assistenza. Ci sono aggiornamenti da comunicarti. Quando sei disponibile per parlare?`,
+    lead:       `Buongiorno ${firstName}! Ti contatto perché avevi mostrato interesse per${productText}. Abbiamo delle novità che potrebbero interessarti. Quando possiamo sentirci?`,
+    problem:    `Buongiorno ${firstName}! Ti contatto per aggiornarti sulla situazione${productText}. Siamo al lavoro per risolvere il prima possibile.`,
   }
 
   return `https://wa.me/${withCC}?text=${encodeURIComponent(messages[category])}`

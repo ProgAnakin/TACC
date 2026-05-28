@@ -2,6 +2,7 @@ export type Category      = 'arrival' | 'assistance' | 'lead' | 'problem'
 export type Status        = 'open' | 'resolved'
 export type Urgency       = 'low' | 'normal' | 'high' | 'critical'
 export type ServiceStatus = 'sent' | 'evaluation' | 'in_repair' | 'ready' | 'delivered'
+export type LeadOutcome = 'converted' | 'lost' | 'no_interest'
 
 export interface Case {
   id: string
@@ -24,6 +25,7 @@ export interface Case {
   expected_date: string | null
   service_status: ServiceStatus | null
   last_contact_at: string | null
+  lead_outcome: LeadOutcome | null
 }
 
 export interface CallLog {
@@ -53,14 +55,14 @@ export const CATEGORY_LABELS: Record<Category, string> = {
   arrival:    '📦 Arrival Alert',
   assistance: '🛠️ Service / Repair',
   lead:       '🎯 Lead / Interest',
-  problem:    '🚨 Inherited Problem',
+  problem:    '⚠️ Complaint / Return',
 }
 
 export const CATEGORY_SHORT: Record<Category, string> = {
   arrival:    '📦 Arrival',
   assistance: '🛠️ Service',
   lead:       '🎯 Lead',
-  problem:    '🚨 Problem',
+  problem:    '⚠️ Complaint',
 }
 
 export const CATEGORY_COLORS: Record<Category, string> = {
@@ -117,6 +119,18 @@ export const SERVICE_STATUS_COLORS: Record<ServiceStatus, string> = {
   in_repair:  'bg-orange-100 text-orange-700',
   ready:      'bg-green-100 text-green-700',
   delivered:  'bg-gray-100 text-gray-500',
+}
+
+export const LEAD_OUTCOME_LABELS: Record<LeadOutcome, string> = {
+  converted:   'Converted ✓',
+  lost:        'Lost',
+  no_interest: 'No Interest',
+}
+
+export const LEAD_OUTCOME_COLORS: Record<LeadOutcome, string> = {
+  converted:   'bg-green-100 text-green-700 border-green-200',
+  lost:        'bg-red-100 text-red-700 border-red-200',
+  no_interest: 'bg-gray-100 text-gray-600 border-gray-200',
 }
 
 export type SortOption = 'newest' | 'oldest' | 'urgency' | 'name'

@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
-import { Search, SlidersHorizontal, X, AlertTriangle, ChevronDown } from 'lucide-react'
+import { Search, SlidersHorizontal, X, AlertTriangle, ChevronDown, AlertCircle } from 'lucide-react'
+import { differenceInDays, isPast } from 'date-fns'
 import { Link } from 'react-router-dom'
 import { Header } from '@/components/layout/Header'
 import { CaseCard } from '@/components/cases/CaseCard'
@@ -32,7 +33,7 @@ const CATEGORY_LEGEND = [
   { emoji: '📦', label: 'Arrival Alert',      desc: 'Client asked to be notified when product arrives'     },
   { emoji: '🛠️', label: 'Service / Repair',   desc: 'Product in repair, transfer between locations, or adjustment' },
   { emoji: '🎯', label: 'Lead / Interest',    desc: 'Interested client — target for follow-up with deals'  },
-  { emoji: '🚨', label: 'Inherited Problem',  desc: 'Issue you took over that needs urgent attention'      },
+  { emoji: '⚠️', label: 'Complaint / Return',  desc: 'Returned item, complaint, or dispute that needs resolution' },
 ]
 
 export default function HomePage() {
@@ -49,6 +50,8 @@ export default function HomePage() {
     sortBy,
   })
 
+  const { data: allOpenCases = [] } = useCases({ status: 'open' })
+
   const { data: stats } = useCaseStats()
 
   const tabCounts = useMemo(() => {
@@ -60,6 +63,22 @@ export default function HomePage() {
     }
     return counts
   }, [stats])
+
+  const attentionCases = useMemo(() => {
+    const now = new Date()
+    return allOpenCases.filter(c => {
+      // Overdue service item (expected_date in the past)
+      if (c.expected_date && isPast(new Date(c.expected_date))) return true
+      // Calculate days since last touch (last_contact_at or created_at)
+      const lastTouch = c.last_contact_at ? new Date(c.last_contact_at) : new Date(c.created_at)
+      const days = differenceInDays(now, lastTouch)
+      // Lead with no follow-up in 3+ days
+      if (c.category === 'lead' && days >= 3) return true
+      // Any case with no contact in 7+ days
+      if (days >= 7) return true
+      return false
+    })
+  }, [allOpenCases])
 
   const dbMissing =
     error instanceof Error &&
@@ -116,6 +135,38 @@ export default function HomePage() {
             <div className="text-xs text-gray-500 mt-0.5">Total resolved</div>
           </div>
         </div>
+
+        {/* Needs Attention */}
+        {!isLoading && attentionCases.length > 0 && (
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-red-500" />
+              <span className="text-sm font-semibold text-gray-800">Needs Attention</span>
+              <span className="bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                {attentionCases.length}
+              </span>
+            </div>
+            <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+              {attentionCases.map(c => {
+                const isOverdue = c.expected_date && isPast(new Date(c.expected_date))
+                const lastTouch = c.last_contact_at ? new Date(c.last_contact_at) : new Date(c.created_at)
+                const days = differenceInDays(new Date(), lastTouch)
+                const reason = isOverdue ? '⏰ Overdue return' : c.category === 'lead' ? '🎯 Follow-up due' : `📅 ${days}d no contact`
+                return (
+                  <Link
+                    key={c.id}
+                    to={`/cases/${c.id}`}
+                    className="shrink-0 w-44 bg-red-50 border border-red-100 rounded-xl p-3 hover:bg-red-100 transition-colors active:scale-[0.98]"
+                  >
+                    <p className="text-sm font-semibold text-gray-900 truncate">{c.client_name}</p>
+                    {c.product_name && <p className="text-xs text-gray-500 truncate mt-0.5">{c.product_name}</p>}
+                    <p className="text-xs text-red-600 font-medium mt-1.5">{reason}</p>
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Sort panel — always in DOM, animated with max-height */}
         <div

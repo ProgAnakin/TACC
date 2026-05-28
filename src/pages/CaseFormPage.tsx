@@ -51,9 +51,9 @@ const CATEGORY_CARDS: {
   },
   {
     value: 'problem',
-    emoji: '🚨',
-    label: 'Inherited Problem',
-    description: 'Issue you took over that needs immediate attention',
+    emoji: '⚠️',
+    label: 'Complaint / Return',
+    description: 'Return, complaint, or dispute you need to resolve for a customer',
     activeBg:   'bg-red-600 border-transparent text-white shadow-md',
     inactiveBg: 'bg-red-50 hover:bg-red-100 border-red-200 text-gray-700',
   },

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Phone, Mail, Clock, PhoneCall, MessageCircle, CalendarClock } from 'lucide-react'
 import { formatDistanceToNow, isPast, format } from 'date-fns'
@@ -5,6 +6,7 @@ import { cn, buildWhatsAppUrl, caseAgeBorderClass, caseAgeLabel } from '@/lib/ut
 import type { Case } from '@/types'
 import { CategoryBadge } from './CategoryBadge'
 import { UrgencyBadge } from './UrgencyBadge'
+import { useLogCall } from '@/hooks/useCallLogs'
 
 interface Props {
   case_: Case
@@ -12,6 +14,22 @@ interface Props {
 }
 
 export function CaseCard({ case_, className }: Props) {
+  const logCall = useLogCall()
+  const [logged, setLogged] = useState(false)
+
+  const handleQuickLog = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (logged || logCall.isPending) return
+    try {
+      await logCall.mutateAsync({ caseId: case_.id })
+      setLogged(true)
+      setTimeout(() => setLogged(false), 3000)
+    } catch {
+      // silent fail — user can log from detail page
+    }
+  }
+
   const age            = caseAgeLabel(case_.created_at)
   const ageBorder      = caseAgeBorderClass(case_.created_at)
   const hasWhatsApp    = !!case_.client_phone
@@ -118,6 +136,18 @@ export function CaseCard({ case_, className }: Props) {
                 Email
               </a>
             )}
+            <button
+              onClick={handleQuickLog}
+              disabled={logCall.isPending}
+              className={`flex items-center gap-1 text-xs px-2 py-1 rounded-md transition-colors ${
+                logged
+                  ? 'text-green-700 bg-green-50'
+                  : 'text-gray-500 hover:text-gray-700 bg-gray-50 hover:bg-gray-100'
+              }`}
+              title="Log contact"
+            >
+              {logged ? '✓ Logged' : '📋 Log'}
+            </button>
           </div>
         )}
       </div>
