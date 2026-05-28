@@ -1,5 +1,5 @@
--- Migration 002 — service fields
--- Run this if you already executed 001_initial.sql
+-- Migration 002 — service fields + missing RLS policy
+-- Safe to re-run (idempotent)
 
 alter table cases add column if not exists expected_date    date;
 alter table cases add column if not exists service_status   text
@@ -20,3 +20,9 @@ drop trigger if exists on_call_log_insert on call_logs;
 create trigger on_call_log_insert
   after insert on call_logs
   for each row execute procedure update_last_contact();
+
+-- Missing UPDATE policy on call_logs (migration 001 only had select/insert/delete)
+drop policy if exists "call_logs_update_own" on call_logs;
+create policy "call_logs_update_own" on call_logs
+  for update using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);

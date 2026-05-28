@@ -49,8 +49,14 @@ export function CallLogSection({ caseId }: Props) {
       setEditingId(null)
       setEditNotes('')
       toast.success('Call updated')
-    } catch {
-      toast.error('Error updating call')
+    } catch (err: unknown) {
+      const msg = (err as any)?.message || String(err)
+      if (msg.toLowerCase().includes('policy') || msg.toLowerCase().includes('row-level')) {
+        toast.error('DB needs migration — run 002_service_fields.sql in Supabase', { duration: 8000 })
+      } else {
+        toast.error(`Error updating call: ${msg}`)
+      }
+      console.error('Call update failed:', err)
     }
   }
 

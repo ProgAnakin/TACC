@@ -123,6 +123,7 @@ export function useCreateCase() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cases'] })
+      queryClient.invalidateQueries({ queryKey: ['case-stats'] })
     },
   })
 }
@@ -145,6 +146,7 @@ export function useUpdateCase() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['cases'] })
       queryClient.invalidateQueries({ queryKey: ['case', data.id] })
+      queryClient.invalidateQueries({ queryKey: ['case-stats'] })
     },
   })
 }
@@ -159,6 +161,7 @@ export function useDeleteCase() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cases'] })
+      queryClient.invalidateQueries({ queryKey: ['case-stats'] })
     },
   })
 }
@@ -185,6 +188,7 @@ export function useResolveCase() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['cases'] })
       queryClient.invalidateQueries({ queryKey: ['case', data.id] })
+      queryClient.invalidateQueries({ queryKey: ['case-stats'] })
     },
   })
 }
