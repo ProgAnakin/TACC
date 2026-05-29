@@ -73,6 +73,7 @@ const schema = z.object({
   expected_date: z.string().optional().or(z.literal('')),
   cause:         z.string().optional().or(z.literal('')),
   notes:         z.string().optional().or(z.literal('')),
+  deal_value:    z.coerce.number().positive().optional().or(z.literal('')),
 })
 
 type FormData = z.infer<typeof schema>
@@ -103,6 +104,7 @@ export default function CaseFormPage() {
 
   const watchedCategory = watch('category')
   const watchedUrgency  = watch('urgency')
+  const watchedDealValue = watch('deal_value')
 
   useEffect(() => {
     if (existingCase) {
@@ -117,6 +119,7 @@ export default function CaseFormPage() {
         expected_date: existingCase.expected_date || '',
         cause:         existingCase.cause  || '',
         notes:         existingCase.notes  || '',
+        deal_value:    existingCase.deal_value ?? '',
       })
     }
   }, [existingCase, reset])
@@ -137,12 +140,13 @@ export default function CaseFormPage() {
       resolved_at:   existingCase?.resolved_at || null,
     }
 
-    // Extra columns added in migration 002 — only include when they have a real value
-    // so the insert still works on databases that haven't run the migration yet.
+    // Extra columns added in migrations 002/003/004 — only include when they have a real value
+    // so the insert still works on databases that haven't run those migrations yet.
     const extras: Record<string, unknown> = {}
     if (data.expected_date) extras.expected_date = data.expected_date
     if (isEditing && existingCase?.service_status) extras.service_status = existingCase.service_status
     if (isEditing && existingCase?.last_contact_at) extras.last_contact_at = existingCase.last_contact_at
+    if (data.deal_value && data.category === 'lead') extras.deal_value = Number(data.deal_value)
 
     const payload = { ...base, ...extras }
 
@@ -262,7 +266,7 @@ export default function CaseFormPage() {
             <Input
               id="client_phone"
               type="tel"
-              placeholder="(11) 99999-9999"
+              placeholder="+39 333 1234567"
               inputMode="tel"
               {...register('client_phone')}
             />
@@ -303,30 +307,67 @@ export default function CaseFormPage() {
           </div>
         </div>
 
-        {/* ── REASON + EXPECTED DATE (service only) ────── */}
-        {watchedCategory === 'assistance' && (
+        {/* ── REASON / COMPLAINT ───────────────────────── */}
+        {(watchedCategory === 'assistance' || watchedCategory === 'problem') && (
           <div className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="cause">Reason for Service</Label>
+              <Label htmlFor="cause">
+                {watchedCategory === 'assistance' ? 'Reason for Service' : 'Complaint Details'}
+              </Label>
               <Textarea
                 id="cause"
-                placeholder="Describe the issue or reason for sending to service..."
+                placeholder={
+                  watchedCategory === 'assistance'
+                    ? 'Describe the issue or reason for sending to service...'
+                    : 'Describe the complaint, return reason, or dispute details...'
+                }
                 rows={3}
                 className="resize-none"
                 {...register('cause')}
               />
             </div>
+          </div>
+        )}
 
-            <div className="space-y-1.5">
-              <Label htmlFor="expected_date">Expected Return Date</Label>
+        {/* ── EXPECTED DATE (service only) ─────────────── */}
+        {watchedCategory === 'assistance' && (
+          <div className="space-y-1.5">
+            <Label htmlFor="expected_date">Expected Return Date</Label>
+            <Input
+              id="expected_date"
+              type="date"
+              className="block"
+              {...register('expected_date')}
+            />
+            <p className="text-xs text-gray-400">When do you expect the item back from service?</p>
+          </div>
+        )}
+
+        {/* ── DEAL VALUE (lead only) ───────────────────── */}
+        {watchedCategory === 'lead' && (
+          <div className="space-y-1.5">
+            <Label htmlFor="deal_value">
+              Estimated Deal Value
+              <span className="ml-1.5 text-gray-400 font-normal text-xs">(optional)</span>
+            </Label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium">€</span>
               <Input
-                id="expected_date"
-                type="date"
-                className="block"
-                {...register('expected_date')}
+                id="deal_value"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+                inputMode="decimal"
+                className="pl-7"
+                {...register('deal_value')}
               />
-              <p className="text-xs text-gray-400">When do you expect the item back from service?</p>
             </div>
+            {watchedDealValue && Number(watchedDealValue) > 0 && (
+              <p className="text-xs text-purple-600 font-medium">
+                Potential value: €{Number(watchedDealValue).toLocaleString('it-IT', { minimumFractionDigits: 2 })}
+              </p>
+            )}
           </div>
         )}
 

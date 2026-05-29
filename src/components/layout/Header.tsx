@@ -5,11 +5,12 @@ import { useAuth } from '@/hooks/useAuth'
 
 interface Props {
   title: string
+  subtitle?: string
   showBack?: boolean
   rightElement?: React.ReactNode
 }
 
-export function Header({ title, showBack = false, rightElement }: Props) {
+export function Header({ title, subtitle, showBack = false, rightElement }: Props) {
   const navigate = useNavigate()
   const { signOut } = useAuth()
 
@@ -35,7 +36,10 @@ export function Header({ title, showBack = false, rightElement }: Props) {
               <BookOpen className="w-4 h-4 text-white" />
             </div>
           )}
-          <h1 className="font-semibold text-gray-900 text-[15px]">{title}</h1>
+          <div>
+            <h1 className="font-semibold text-gray-900 text-[15px] leading-tight">{title}</h1>
+            {subtitle && <p className="text-[11px] text-gray-400 font-medium leading-tight">{subtitle}</p>}
+          </div>
         </div>
 
         <div className="flex items-center gap-1">

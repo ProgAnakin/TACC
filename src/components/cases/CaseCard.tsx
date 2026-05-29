@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Phone, Mail, Clock, PhoneCall, MessageCircle, CalendarClock } from 'lucide-react'
+import { Phone, Mail, Clock, PhoneCall, MessageCircle, CalendarClock, Copy } from 'lucide-react'
 import { formatDistanceToNow, isPast, format } from 'date-fns'
-import { cn, buildWhatsAppUrl, caseAgeBorderClass, caseAgeLabel } from '@/lib/utils'
+import { toast } from 'sonner'
+import { cn, buildWhatsAppUrl, caseAgeBorderClass, caseAgeLabel, copyToClipboard, shortCaseId } from '@/lib/utils'
 import type { Case } from '@/types'
 import { CategoryBadge } from './CategoryBadge'
 import { UrgencyBadge } from './UrgencyBadge'
@@ -28,6 +29,14 @@ export function CaseCard({ case_, className }: Props) {
     } catch {
       // silent fail — user can log from detail page
     }
+  }
+
+  const handleCopyPhone = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (!case_.client_phone) return
+    const ok = await copyToClipboard(case_.client_phone)
+    if (ok) toast.success('Phone copied!')
   }
 
   const age            = caseAgeLabel(case_.created_at)
@@ -99,6 +108,7 @@ export function CaseCard({ case_, className }: Props) {
           {case_.shopify_order && (
             <span className="text-gray-400 truncate">#{case_.shopify_order}</span>
           )}
+          <span className="text-gray-300 ml-auto">#{shortCaseId(case_.id)}</span>
         </div>
 
         {/* Contact quick actions */}
@@ -135,6 +145,15 @@ export function CaseCard({ case_, className }: Props) {
                 <Mail className="w-3 h-3" />
                 Email
               </a>
+            )}
+            {case_.client_phone && (
+              <button
+                onClick={handleCopyPhone}
+                className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 bg-gray-50 hover:bg-gray-100 px-2 py-1 rounded-md transition-colors"
+                title="Copy phone"
+              >
+                <Copy className="w-3 h-3" />
+              </button>
             )}
             <button
               onClick={handleQuickLog}

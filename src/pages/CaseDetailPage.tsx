@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import {
   Phone, Mail, Edit3, Trash2, CheckCircle2, Loader2,
   FileDown, RotateCcw, Calendar, Package, MessageCircle,
-  Bell, CalendarClock,
+  Bell, CalendarClock, Copy, Pencil, X, Check, Euro,
 } from 'lucide-react'
 import { format, isPast } from 'date-fns'
 import { toast } from 'sonner'
@@ -26,7 +26,8 @@ import {
 import { useCase, useDeleteCase, useResolveCase, useUpdateCase } from '@/hooks/useCases'
 import { useCreateReminder } from '@/hooks/useReminders'
 import { generateAssistancePDF, type PdfLocale } from '@/lib/pdf'
-import { buildWhatsAppUrl } from '@/lib/utils'
+import { buildWhatsAppUrl, copyToClipboard, shortCaseId } from '@/lib/utils'
+import { Textarea } from '@/components/ui/textarea'
 import type { ServiceStatus, LeadOutcome } from '@/types'
 import { LEAD_OUTCOME_LABELS, LEAD_OUTCOME_COLORS } from '@/types'
 
@@ -47,8 +48,10 @@ export default function CaseDetailPage() {
   const resolveCase     = useResolveCase()
   const updateCase      = useUpdateCase()
   const createReminder  = useCreateReminder()
-  const [pdfDialogOpen, setPdfDialogOpen] = useState(false)
-  const [outcomeLoading, setOutcomeLoading] = useState<LeadOutcome | null>(null)
+  const [pdfDialogOpen, setPdfDialogOpen]     = useState(false)
+  const [outcomeLoading, setOutcomeLoading]   = useState<LeadOutcome | null>(null)
+  const [editingNotes, setEditingNotes]       = useState(false)
+  const [notesValue, setNotesValue]           = useState('')
 
   const handleDelete = async () => {
     try {
@@ -120,6 +123,28 @@ export default function CaseDetailPage() {
     }
   }
 
+  const handleCopyPhone = async () => {
+    if (!case_?.client_phone) return
+    const ok = await copyToClipboard(case_.client_phone)
+    if (ok) toast.success('Phone copied!')
+    else    toast.error('Copy failed')
+  }
+
+  const startEditNotes = () => {
+    setNotesValue(case_?.notes || '')
+    setEditingNotes(true)
+  }
+
+  const handleSaveNotes = async () => {
+    try {
+      await updateCase.mutateAsync({ id: id!, notes: notesValue.trim() || null })
+      setEditingNotes(false)
+      toast.success('Notes saved')
+    } catch {
+      toast.error('Error saving notes')
+    }
+  }
+
   const handlePDF = (locale: PdfLocale) => {
     if (!case_) return
     try {
@@ -161,12 +186,16 @@ export default function CaseDetailPage() {
     ? buildWhatsAppUrl(case_.client_phone, case_.category, case_.client_name, case_.product_name)
     : null
   const expectedPast   = case_.expected_date && isPast(new Date(case_.expected_date))
+  const causeLabel     = case_.category === 'problem' ? 'Complaint Details'
+                       : case_.category === 'arrival' ? 'Details'
+                       : 'Reason for Service'
 
   return (
     <>
       <Header
         title={case_.client_name}
         showBack
+        subtitle={`#${shortCaseId(case_.id)}`}
         rightElement={
           <Button variant="ghost" size="sm" onClick={() => navigate(`/cases/${id}/edit`)} className="h-8 px-2 text-gray-500">
             <Edit3 className="w-4 h-4" />
@@ -199,32 +228,43 @@ export default function CaseDetailPage() {
 
         {/* Primary contact actions */}
         {(case_.client_phone || case_.client_email) && (
-          <div className="flex gap-2">
+          <div className="space-y-2">
+            <div className="flex gap-2">
+              {case_.client_phone && (
+                <a
+                  href={`tel:${case_.client_phone}`}
+                  className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-3 rounded-xl transition-colors active:scale-95"
+                >
+                  <Phone className="w-4 h-4" /> Call
+                </a>
+              )}
+              {waUrl && (
+                <a
+                  href={waUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold py-3 rounded-xl transition-colors active:scale-95"
+                >
+                  <MessageCircle className="w-4 h-4" /> WhatsApp
+                </a>
+              )}
+              {case_.client_email && (
+                <a
+                  href={`mailto:${case_.client_email}`}
+                  className="flex-1 flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold py-3 rounded-xl transition-colors active:scale-95"
+                >
+                  <Mail className="w-4 h-4" /> Email
+                </a>
+              )}
+            </div>
             {case_.client_phone && (
-              <a
-                href={`tel:${case_.client_phone}`}
-                className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-3 rounded-xl transition-colors active:scale-95"
+              <button
+                onClick={handleCopyPhone}
+                className="w-full flex items-center justify-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-600 text-xs font-medium py-2 rounded-xl transition-colors active:scale-95"
               >
-                <Phone className="w-4 h-4" /> Call
-              </a>
-            )}
-            {waUrl && (
-              <a
-                href={waUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold py-3 rounded-xl transition-colors active:scale-95"
-              >
-                <MessageCircle className="w-4 h-4" /> WhatsApp
-              </a>
-            )}
-            {case_.client_email && (
-              <a
-                href={`mailto:${case_.client_email}`}
-                className="flex-1 flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold py-3 rounded-xl transition-colors active:scale-95"
-              >
-                <Mail className="w-4 h-4" /> Email
-              </a>
+                <Copy className="w-3.5 h-3.5" />
+                Copy phone number
+              </button>
             )}
           </div>
         )}
@@ -329,21 +369,79 @@ export default function CaseDetailPage() {
             </div>
           )}
 
+          {/* Deal value — leads only */}
+          {case_.category === 'lead' && case_.deal_value != null && (
+            <div className="p-4 space-y-1">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Estimated Value</p>
+              <p className="flex items-center gap-1.5 text-base font-bold text-purple-700">
+                <Euro className="w-4 h-4" />
+                {case_.deal_value.toLocaleString('it-IT', { minimumFractionDigits: 2 })}
+              </p>
+            </div>
+          )}
+
           {/* Cause */}
           {case_.cause && (
             <div className="p-4 space-y-2">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Reason for Service</p>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{causeLabel}</p>
               <p className="text-sm text-gray-700 leading-relaxed">{case_.cause}</p>
             </div>
           )}
 
-          {/* Notes */}
-          {case_.notes && (
-            <div className="p-4 space-y-2">
+          {/* Notes — always visible, inline editable */}
+          <div className="p-4 space-y-2">
+            <div className="flex items-center justify-between">
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Notes</p>
-              <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{case_.notes}</p>
+              {!editingNotes && (
+                <button
+                  onClick={startEditNotes}
+                  className="p-1 rounded-md text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                  title="Edit notes"
+                >
+                  <Pencil className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
-          )}
+            {editingNotes ? (
+              <div className="space-y-2">
+                <Textarea
+                  value={notesValue}
+                  onChange={(e) => setNotesValue(e.target.value)}
+                  rows={3}
+                  className="text-sm resize-none"
+                  placeholder="Add notes, context, next steps..."
+                  autoFocus
+                />
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    onClick={handleSaveNotes}
+                    disabled={updateCase.isPending}
+                    className="flex-1 h-8"
+                  >
+                    {updateCase.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <><Check className="w-3.5 h-3.5 mr-1" /> Save</>}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setEditingNotes(false)}
+                    className="h-8"
+                  >
+                    <X className="w-3.5 h-3.5 mr-1" /> Cancel
+                  </Button>
+                </div>
+              </div>
+            ) : case_.notes ? (
+              <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{case_.notes}</p>
+            ) : (
+              <button
+                onClick={startEditNotes}
+                className="text-sm text-gray-400 hover:text-blue-600 italic transition-colors"
+              >
+                + Add a note...
+              </button>
+            )}
+          </div>
 
           {/* Dates */}
           <div className="p-4 space-y-1.5">

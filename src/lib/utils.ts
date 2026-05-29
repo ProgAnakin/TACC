@@ -59,6 +59,37 @@ export function caseAgeBorderClass(createdAt: string): string {
   return 'border-l-4 border-l-transparent'
 }
 
+/** Short 6-char reference ID derived from the case UUID. */
+export function shortCaseId(id: string): string {
+  return id.replace(/-/g, '').slice(-6).toUpperCase()
+}
+
+/** Copies text to clipboard, resolves true on success. */
+export async function copyToClipboard(text: string): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(text)
+    return true
+  } catch {
+    return false
+  }
+}
+
+/** Parse contact type prefix from notes string. */
+export type ContactType = 'call' | 'visit' | 'message' | 'whatsapp'
+
+export function parseContactLog(raw: string | null): { type: ContactType; notes: string | null } {
+  if (!raw) return { type: 'call', notes: null }
+  const m = raw.match(/^\[type:(call|visit|message|whatsapp)\]\s*([\s\S]*)$/)
+  if (m) return { type: m[1] as ContactType, notes: m[2].trim() || null }
+  return { type: 'call', notes: raw }
+}
+
+export function serializeContactLog(type: ContactType, notes: string): string | null {
+  const n = notes.trim()
+  if (type === 'call') return n || null
+  return n ? `[type:${type}] ${n}` : `[type:${type}]`
+}
+
 /** Human-readable age label with urgency color. */
 export function caseAgeLabel(createdAt: string): { text: string; color: string } {
   const days = Math.floor((Date.now() - new Date(createdAt).getTime()) / 86_400_000)

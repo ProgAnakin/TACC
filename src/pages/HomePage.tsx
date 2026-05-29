@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Search, SlidersHorizontal, X, AlertTriangle, ChevronDown, AlertCircle } from 'lucide-react'
+import { Search, SlidersHorizontal, X, AlertTriangle, ChevronDown, AlertCircle, Download } from 'lucide-react'
 import { differenceInDays, isPast } from 'date-fns'
 import { Link } from 'react-router-dom'
 import { Header } from '@/components/layout/Header'
@@ -7,6 +7,7 @@ import { CaseCard } from '@/components/cases/CaseCard'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useCases, useCaseStats } from '@/hooks/useCases'
+import { usePWAInstall } from '@/hooks/usePWAInstall'
 import type { Category } from '@/types'
 import { CATEGORY_SHORT } from '@/types'
 
@@ -53,6 +54,7 @@ export default function HomePage() {
   const { data: allOpenCases = [] } = useCases({ status: 'open' })
 
   const { data: stats } = useCaseStats()
+  const { canInstall, install } = usePWAInstall()
 
   const tabCounts = useMemo(() => {
     const counts: Record<string, number> = { all: stats?.open || 0 }
@@ -120,6 +122,25 @@ export default function HomePage() {
           </div>
         )}
 
+        {/* PWA install banner */}
+        {canInstall && (
+          <div className="flex items-center gap-3 bg-blue-50 border border-blue-100 rounded-xl p-3">
+            <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center shrink-0">
+              <Download className="w-4.5 h-4.5 text-white" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-blue-900">Install App</p>
+              <p className="text-xs text-blue-600 truncate">Add to home screen for faster access</p>
+            </div>
+            <button
+              onClick={install}
+              className="shrink-0 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors active:scale-95"
+            >
+              Install
+            </button>
+          </div>
+        )}
+
         {/* Stats */}
         <div className="grid grid-cols-3 gap-2">
           <div className="bg-white rounded-xl border border-gray-100 p-3 text-center shadow-sm">
@@ -130,9 +151,11 @@ export default function HomePage() {
             <div className="text-2xl font-bold text-green-600">{stats?.resolvedToday ?? 0}</div>
             <div className="text-xs text-gray-500 mt-0.5">Resolved today</div>
           </div>
-          <div className="bg-white rounded-xl border border-gray-100 p-3 text-center shadow-sm">
-            <div className="text-2xl font-bold text-gray-400">{stats?.totalResolved ?? 0}</div>
-            <div className="text-xs text-gray-500 mt-0.5">Total resolved</div>
+          <div className={`bg-white rounded-xl border p-3 text-center shadow-sm ${attentionCases.length > 0 ? 'border-red-200' : 'border-gray-100'}`}>
+            <div className={`text-2xl font-bold ${attentionCases.length > 0 ? 'text-red-500' : 'text-gray-300'}`}>
+              {attentionCases.length}
+            </div>
+            <div className="text-xs text-gray-500 mt-0.5">Need attention</div>
           </div>
         </div>
 

@@ -26,6 +26,8 @@ export interface Case {
   service_status: ServiceStatus | null
   last_contact_at: string | null
   lead_outcome: LeadOutcome | null
+  /* Added via migration 004 */
+  deal_value: number | null
 }
 
 export interface CallLog {
