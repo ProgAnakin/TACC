@@ -7,7 +7,7 @@ import { Header } from '@/components/layout/Header'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useReminders, useDeleteReminder, useMarkReminderSent } from '@/hooks/useReminders'
-import { requestPermission, getPermission, scheduleReminderCheck } from '@/lib/notifications'
+import { requestPermission, getPermission, scheduleReminderCheck, isNotificationSupported } from '@/lib/notifications'
 import type { Reminder } from '@/types'
 
 function getReminderLabel(dateStr: string): string {
@@ -23,6 +23,7 @@ export default function RemindersPage() {
   const markSent = useMarkReminderSent()
 
   const permission = getPermission()
+  const notifSupported = isNotificationSupported()
 
   const handleEnableNotifications = async () => {
     const result = await requestPermission()
@@ -106,14 +107,25 @@ export default function RemindersPage() {
       <Header title="Reminders" />
 
       <div className="px-4 py-4 space-y-4 pb-28">
-        {/* Notification permission banner */}
-        {permission !== 'granted' && (
+        {/* Notification status banner — honest about the iPhone reality */}
+        {!notifSupported ? (
+          <div className="bg-blue-50 border border-blue-100 rounded-xl p-3.5 flex items-start gap-3">
+            <Bell className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-blue-900">Reminders show here in the app</p>
+              <p className="text-xs text-blue-600 mt-0.5">
+                Due reminders appear on your Home screen and the Reminders tab badge. For pop-up alerts on
+                iPhone, add the app to your Home Screen (iOS 16.4 or later).
+              </p>
+            </div>
+          </div>
+        ) : permission !== 'granted' && (
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-3.5 flex items-start gap-3">
             <Bell className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
             <div className="flex-1">
-              <p className="text-sm font-medium text-amber-800">Enable push notifications</p>
+              <p className="text-sm font-medium text-amber-800">Enable pop-up alerts</p>
               <p className="text-xs text-amber-600 mt-0.5">
-                Get alerts while the app is open. On iPhone, install as PWA for background notifications.
+                Due reminders always show in-app. Enable notifications for pop-up alerts while the app is open.
               </p>
             </div>
             <Button

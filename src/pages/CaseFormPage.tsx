@@ -257,7 +257,7 @@ export default function CaseFormPage() {
             <Label htmlFor="client_name">
               Name <span className="text-red-500">*</span>
             </Label>
-            <Input id="client_name" placeholder="Full name" {...register('client_name')} />
+            <Input id="client_name" placeholder="Full name" autoCapitalize="words" {...register('client_name')} />
             {errors.client_name && <p className="text-xs text-red-500">{errors.client_name.message}</p>}
           </div>
 
@@ -268,6 +268,9 @@ export default function CaseFormPage() {
               type="tel"
               placeholder="+39 333 1234567"
               inputMode="tel"
+              autoCapitalize="off"
+              autoCorrect="off"
+              autoComplete="tel"
               {...register('client_phone')}
             />
           </div>
@@ -279,6 +282,9 @@ export default function CaseFormPage() {
               type="email"
               placeholder="client@email.com"
               inputMode="email"
+              autoCapitalize="off"
+              autoCorrect="off"
+              autoComplete="email"
               {...register('client_email')}
             />
             {errors.client_email && <p className="text-xs text-red-500">{errors.client_email.message}</p>}
@@ -302,6 +308,8 @@ export default function CaseFormPage() {
               id="shopify_order"
               placeholder="e.g. 1234"
               inputMode="numeric"
+              autoCapitalize="off"
+              autoCorrect="off"
               {...register('shopify_order')}
             />
           </div>

@@ -5,9 +5,29 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
 }
 
+function detectIOS(): boolean {
+  if (typeof navigator === 'undefined') return false
+  const ua = navigator.userAgent
+  const isIOSDevice = /iphone|ipad|ipod/i.test(ua)
+  // iPadOS 13+ reports as Mac but has touch
+  const isIPadOS = /macintosh/i.test(ua) && 'ontouchend' in document
+  return isIOSDevice || isIPadOS
+}
+
+function isStandalone(): boolean {
+  if (typeof window === 'undefined') return false
+  // iOS uses navigator.standalone; others use the display-mode media query
+  return (
+    window.matchMedia('(display-mode: standalone)').matches ||
+    (navigator as unknown as { standalone?: boolean }).standalone === true
+  )
+}
+
 export function usePWAInstall() {
   const [prompt, setPrompt]       = useState<BeforeInstallPromptEvent | null>(null)
-  const [installed, setInstalled] = useState(false)
+  const [installed, setInstalled] = useState(isStandalone)
+
+  const isIOS = detectIOS()
 
   useEffect(() => {
     const capture = (e: Event) => {
@@ -37,5 +57,13 @@ export function usePWAInstall() {
     return outcome === 'accepted'
   }
 
-  return { canInstall: !!prompt && !installed, install }
+  return {
+    /** Chrome / Android: native install prompt available */
+    canInstall: !!prompt && !installed,
+    /** iOS Safari, not yet added to home screen → show manual instructions */
+    showIOSInstructions: isIOS && !installed,
+    isIOS,
+    installed,
+    install,
+  }
 }

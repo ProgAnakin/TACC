@@ -7,7 +7,11 @@ import { CaseCard } from '@/components/cases/CaseCard'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useCases, useCaseStats } from '@/hooks/useCases'
+import { useDueReminders, useMarkReminderSent } from '@/hooks/useReminders'
 import { usePWAInstall } from '@/hooks/usePWAInstall'
+import { IOSInstallCard } from '@/components/IOSInstallCard'
+import { toast } from 'sonner'
+import { Bell, Check } from 'lucide-react'
 import type { Category } from '@/types'
 import { CATEGORY_SHORT } from '@/types'
 
@@ -54,7 +58,20 @@ export default function HomePage() {
   const { data: allOpenCases = [] } = useCases({ status: 'open' })
 
   const { data: stats } = useCaseStats()
-  const { canInstall, install } = usePWAInstall()
+  const { data: dueReminders = [] } = useDueReminders()
+  const markSent = useMarkReminderSent()
+  const { canInstall, showIOSInstructions, install } = usePWAInstall()
+
+  const handleMarkDone = async (e: React.MouseEvent, reminderId: string) => {
+    e.preventDefault()
+    e.stopPropagation()
+    try {
+      await markSent.mutateAsync(reminderId)
+      toast.success('Done ✓')
+    } catch {
+      toast.error('Error updating reminder')
+    }
+  }
 
   const tabCounts = useMemo(() => {
     const counts: Record<string, number> = { all: stats?.open || 0 }
@@ -122,7 +139,10 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* PWA install banner */}
+        {/* iOS install instructions (beforeinstallprompt never fires on Safari) */}
+        {showIOSInstructions && <IOSInstallCard />}
+
+        {/* PWA install banner (Android / Chrome) */}
         {canInstall && (
           <div className="flex items-center gap-3 bg-blue-50 border border-blue-100 rounded-xl p-3">
             <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center shrink-0">
@@ -138,6 +158,53 @@ export default function HomePage() {
             >
               Install
             </button>
+          </div>
+        )}
+
+        {/* Due reminders — the in-app safety net (iPhone OS alerts are unreliable) */}
+        {dueReminders.length > 0 && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl overflow-hidden">
+            <div className="flex items-center gap-2 px-3.5 py-2.5 border-b border-amber-100">
+              <Bell className="w-4 h-4 text-amber-600" />
+              <span className="text-sm font-semibold text-amber-800">Reminders due now</span>
+              <span className="bg-amber-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                {dueReminders.length}
+              </span>
+            </div>
+            <div className="divide-y divide-amber-100">
+              {dueReminders.slice(0, 4).map((r) => (
+                <Link
+                  key={r.id}
+                  to={`/cases/${r.case_id}`}
+                  className="flex items-center gap-2 px-3.5 py-2.5 hover:bg-amber-100/50 transition-colors"
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 truncate">{r.title}</p>
+                    {r.case && (
+                      <p className="text-xs text-amber-600 truncate">
+                        {r.case.client_name}
+                        {r.case.product_name && ` — ${r.case.product_name}`}
+                      </p>
+                    )}
+                  </div>
+                  <button
+                    onClick={(e) => handleMarkDone(e, r.id)}
+                    disabled={markSent.isPending}
+                    className="shrink-0 flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-colors active:scale-95"
+                  >
+                    <Check className="w-3.5 h-3.5" /> Done
+                  </button>
+                </Link>
+              ))}
+              {dueReminders.length > 4 && (
+                <Link
+                  to="/reminders"
+                  className="block text-center text-xs font-medium text-amber-700 hover:bg-amber-100/50 py-2 transition-colors"
+                >
+                  View all {dueReminders.length} reminders
+                </Link>
+              )}
+            </div>
           </div>
         )}
 

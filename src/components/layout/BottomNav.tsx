@@ -1,6 +1,7 @@
 import { NavLink, Link } from 'react-router-dom'
 import { Home, Bell, Archive, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useDueReminders } from '@/hooks/useReminders'
 
 const NAV_ITEMS = [
   { to: '/',          icon: Home,    label: 'Cases',     end: true  },
@@ -12,6 +13,9 @@ const NAV_ITEMS_RIGHT = [
 ] as const
 
 export function BottomNav() {
+  const { data: dueReminders = [] } = useDueReminders()
+  const dueCount = dueReminders.length
+
   return (
     <>
       {/* Floating Action Button — sits above the nav bar */}
@@ -40,26 +44,36 @@ export function BottomNav() {
         <div className="flex h-16 max-w-lg mx-auto">
 
           {/* Left items */}
-          {NAV_ITEMS.map(({ to, icon: Icon, label, end }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={end}
-              className={({ isActive }) =>
-                cn(
-                  'flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors',
-                  isActive ? 'text-blue-600' : 'text-gray-400 hover:text-gray-600',
-                )
-              }
-            >
-              {({ isActive }) => (
-                <>
-                  <Icon className="w-5 h-5" strokeWidth={isActive ? 2.5 : 1.8} />
-                  <span className="text-[10px] font-medium">{label}</span>
-                </>
-              )}
-            </NavLink>
-          ))}
+          {NAV_ITEMS.map(({ to, icon: Icon, label, end }) => {
+            const showBadge = to === '/reminders' && dueCount > 0
+            return (
+              <NavLink
+                key={to}
+                to={to}
+                end={end}
+                className={({ isActive }) =>
+                  cn(
+                    'flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors relative',
+                    isActive ? 'text-blue-600' : 'text-gray-400 hover:text-gray-600',
+                  )
+                }
+              >
+                {({ isActive }) => (
+                  <>
+                    <div className="relative">
+                      <Icon className="w-5 h-5" strokeWidth={isActive ? 2.5 : 1.8} />
+                      {showBadge && (
+                        <span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                          {dueCount > 9 ? '9+' : dueCount}
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-[10px] font-medium">{label}</span>
+                  </>
+                )}
+              </NavLink>
+            )
+          })}
 
           {/* Center spacer — reserved for FAB */}
           <div className="flex-1 flex flex-col items-center justify-end pb-2">

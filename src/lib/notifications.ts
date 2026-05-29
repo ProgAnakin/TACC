@@ -1,5 +1,11 @@
+/** Whether the browser exposes the Notification API at all.
+ *  iOS Safari in a normal tab does NOT — only installed PWAs on iOS 16.4+. */
+export function isNotificationSupported(): boolean {
+  return typeof window !== 'undefined' && 'Notification' in window
+}
+
 export function getPermission(): NotificationPermission {
-  if (typeof window === 'undefined' || !('Notification' in window)) return 'denied'
+  if (!isNotificationSupported()) return 'denied'
   return Notification.permission
 }
 

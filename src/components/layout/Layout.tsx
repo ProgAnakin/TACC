@@ -9,7 +9,10 @@ export default function Layout() {
   return (
     <div className="min-h-screen bg-gray-50">
       {!isOnline && (
-        <div className="sticky top-0 z-50 bg-red-600 text-white text-xs text-center py-2 px-4 flex items-center justify-center gap-2">
+        <div
+          className="bg-red-600 text-white text-xs text-center py-2 px-4 flex items-center justify-center gap-2"
+          style={{ paddingTop: 'calc(env(safe-area-inset-top) + 0.5rem)' }}
+        >
           <WifiOff className="w-3.5 h-3.5 shrink-0" />
           No internet connection — changes may not save
         </div>

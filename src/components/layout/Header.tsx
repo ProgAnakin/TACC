@@ -21,7 +21,10 @@ export function Header({ title, subtitle, showBack = false, rightElement }: Prop
   }
 
   return (
-    <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-sm border-b border-gray-100">
+    <header
+      className="sticky top-0 z-30 bg-white/90 backdrop-blur-sm border-b border-gray-100"
+      style={{ paddingTop: 'env(safe-area-inset-top)' }}
+    >
       <div className="flex items-center justify-between px-4 h-14 max-w-lg mx-auto">
         <div className="flex items-center gap-2">
           {showBack ? (

@@ -56,6 +56,34 @@ export function useUpcomingReminders() {
   })
 }
 
+/** Reminders that are due now (unsent, remind_at <= now) — the in-app safety net
+ *  for iPhone, where OS push notifications are unreliable. */
+export function useDueReminders() {
+  const { user } = useAuth()
+
+  return useQuery({
+    queryKey: ['reminders-due', user?.id],
+    queryFn: async () => {
+      if (!user) return []
+
+      const now = new Date().toISOString()
+
+      const { data, error } = await supabase
+        .from('reminders')
+        .select('*, case:cases(client_name, product_name, category)')
+        .eq('user_id', user.id)
+        .eq('sent', false)
+        .lte('remind_at', now)
+        .order('remind_at', { ascending: true })
+
+      if (error) throw error
+      return data as (Reminder & { case?: { client_name: string; product_name: string | null; category: string } })[]
+    },
+    enabled: !!user,
+    refetchInterval: 60 * 1000, // re-check every minute while app is open
+  })
+}
+
 export function useCreateReminder() {
   const queryClient = useQueryClient()
   const { user } = useAuth()
@@ -90,6 +118,7 @@ export function useCreateReminder() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reminders'] })
       queryClient.invalidateQueries({ queryKey: ['reminders-upcoming'] })
+      queryClient.invalidateQueries({ queryKey: ['reminders-due'] })
     },
   })
 }
@@ -105,6 +134,7 @@ export function useDeleteReminder() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reminders'] })
       queryClient.invalidateQueries({ queryKey: ['reminders-upcoming'] })
+      queryClient.invalidateQueries({ queryKey: ['reminders-due'] })
     },
   })
 }
@@ -120,6 +150,7 @@ export function useMarkReminderSent() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reminders'] })
       queryClient.invalidateQueries({ queryKey: ['reminders-upcoming'] })
+      queryClient.invalidateQueries({ queryKey: ['reminders-due'] })
     },
   })
 }
