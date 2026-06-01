@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   Phone, Mail, Edit3, Trash2, CheckCircle2, Loader2,
@@ -52,6 +52,19 @@ export default function CaseDetailPage() {
   const [outcomeLoading, setOutcomeLoading]   = useState<LeadOutcome | null>(null)
   const [editingNotes, setEditingNotes]       = useState(false)
   const [notesValue, setNotesValue]           = useState('')
+  const contactRef                            = useRef<HTMLDivElement>(null)
+  const [showFloatingContact, setShowFloatingContact] = useState(false)
+
+  useEffect(() => {
+    const el = contactRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowFloatingContact(!entry.isIntersecting),
+      { threshold: 0 },
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [case_?.id])
 
   const handleDelete = async () => {
     try {
@@ -228,7 +241,7 @@ export default function CaseDetailPage() {
 
         {/* Primary contact actions */}
         {(case_.client_phone || case_.client_email) && (
-          <div className="space-y-2">
+          <div ref={contactRef} className="space-y-2">
             <div className="flex gap-2">
               {case_.client_phone && (
                 <a
@@ -611,6 +624,39 @@ export default function CaseDetailPage() {
           </AlertDialog>
         </div>
       </div>
+
+      {/* Floating contact pill — appears when top contact buttons scroll out of view */}
+      {showFloatingContact && (case_.client_phone || waUrl) && (
+        <div
+          className="fixed left-4 right-4 z-30 flex items-center gap-2 bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.13)] border border-gray-200 px-3 py-2"
+          style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom) + 0.75rem)' }}
+        >
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-semibold text-gray-700 truncate">{case_.client_name}</p>
+            {case_.client_phone && (
+              <p className="text-[11px] text-gray-400 truncate">{case_.client_phone}</p>
+            )}
+          </div>
+          {case_.client_phone && (
+            <a
+              href={`tel:${case_.client_phone}`}
+              className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-2 rounded-xl transition-colors active:scale-95"
+            >
+              <Phone className="w-3.5 h-3.5" /> Call
+            </a>
+          )}
+          {waUrl && (
+            <a
+              href={waUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-3 py-2 rounded-xl transition-colors active:scale-95"
+            >
+              <MessageCircle className="w-3.5 h-3.5" /> WA
+            </a>
+          )}
+        </div>
+      )}
     </>
   )
 }

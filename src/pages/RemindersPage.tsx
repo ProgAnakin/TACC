@@ -95,7 +95,7 @@ export default function RemindersPage() {
       </div>
       <button
         onClick={() => handleDelete(reminder.id)}
-        className="shrink-0 p-1.5 text-gray-300 hover:text-red-500 transition-colors"
+        className="touch-target shrink-0 rounded-lg text-gray-300 hover:text-red-500 transition-colors"
       >
         <Trash2 className="w-4 h-4" />
       </button>
