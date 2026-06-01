@@ -139,13 +139,13 @@ export default function ArchivePage() {
                 <button
                   onClick={(e) => handleReopen(case_.id, e)}
                   disabled={updateCase.isPending}
-                  className="shrink-0 p-1.5 rounded-lg border border-gray-200 hover:bg-blue-50 hover:border-blue-200 text-gray-400 hover:text-blue-600 transition-colors"
+                  className="touch-target shrink-0 rounded-xl border border-gray-200 hover:bg-blue-50 hover:border-blue-200 text-gray-400 hover:text-blue-600 transition-colors"
                   title="Reopen case"
                 >
                   {updateCase.isPending ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
-                    <RotateCcw className="w-3.5 h-3.5" />
+                    <RotateCcw className="w-4 h-4" />
                   )}
                 </button>
               </Link>

@@ -111,16 +111,16 @@ export function CaseCard({ case_, className }: Props) {
           <span className="text-gray-300 ml-auto">#{shortCaseId(case_.id)}</span>
         </div>
 
-        {/* Contact quick actions */}
+        {/* Contact quick actions — min 36px tall for comfortable mobile tapping */}
         {(case_.client_phone || case_.client_email) && (
-          <div className="flex items-center gap-2 mt-2.5">
+          <div className="flex items-center gap-1.5 mt-2.5 flex-wrap">
             {case_.client_phone && (
               <a
                 href={`tel:${case_.client_phone}`}
                 onClick={(e) => e.stopPropagation()}
-                className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 bg-blue-50 px-2 py-1 rounded-md"
+                className="flex items-center gap-1.5 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-100 px-3 py-2 rounded-lg transition-colors active:scale-95"
               >
-                <Phone className="w-3 h-3" />
+                <Phone className="w-3.5 h-3.5" />
                 Call
               </a>
             )}
@@ -130,38 +130,37 @@ export function CaseCard({ case_, className }: Props) {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
-                className="flex items-center gap-1 text-xs text-green-700 bg-green-50 hover:bg-green-100 px-2 py-1 rounded-md"
+                className="flex items-center gap-1.5 text-xs font-medium text-green-700 bg-green-50 hover:bg-green-100 border border-green-100 px-3 py-2 rounded-lg transition-colors active:scale-95"
               >
-                <MessageCircle className="w-3 h-3" />
-                WhatsApp
-              </a>
-            )}
-            {case_.client_email && (
-              <a
-                href={`mailto:${case_.client_email}`}
-                onClick={(e) => e.stopPropagation()}
-                className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 bg-gray-50 px-2 py-1 rounded-md"
-              >
-                <Mail className="w-3 h-3" />
-                Email
+                <MessageCircle className="w-3.5 h-3.5" />
+                WA
               </a>
             )}
             {case_.client_phone && (
               <button
                 onClick={handleCopyPhone}
-                className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 bg-gray-50 hover:bg-gray-100 px-2 py-1 rounded-md transition-colors"
+                className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-700 bg-gray-50 hover:bg-gray-100 border border-gray-100 px-3 py-2 rounded-lg transition-colors active:scale-95"
                 title="Copy phone"
               >
-                <Copy className="w-3 h-3" />
+                <Copy className="w-3.5 h-3.5" />
               </button>
+            )}
+            {case_.client_email && (
+              <a
+                href={`mailto:${case_.client_email}`}
+                onClick={(e) => e.stopPropagation()}
+                className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-700 bg-gray-50 hover:bg-gray-100 border border-gray-100 px-3 py-2 rounded-lg transition-colors active:scale-95"
+              >
+                <Mail className="w-3.5 h-3.5" />
+              </a>
             )}
             <button
               onClick={handleQuickLog}
               disabled={logCall.isPending}
-              className={`flex items-center gap-1 text-xs px-2 py-1 rounded-md transition-colors ${
+              className={`flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-lg border transition-colors active:scale-95 ${
                 logged
-                  ? 'text-green-700 bg-green-50'
-                  : 'text-gray-500 hover:text-gray-700 bg-gray-50 hover:bg-gray-100'
+                  ? 'text-green-700 bg-green-50 border-green-100'
+                  : 'text-gray-500 hover:text-gray-700 bg-gray-50 hover:bg-gray-100 border-gray-100'
               }`}
               title="Log contact"
             >

@@ -223,17 +223,17 @@ export function CallLogSection({ caseId }: Props) {
                   )}
                 </div>
                 {!isEditing && (
-                  <div className="flex items-center gap-0.5 shrink-0">
+                  <div className="flex items-center shrink-0">
                     <button
                       onClick={() => handleStartEdit(log.id, log.notes)}
-                      className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                      className="touch-target rounded-lg text-gray-400 hover:text-blue-600 transition-colors"
                       title="Edit"
                     >
                       <Pencil className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => setDeleteId(log.id)}
-                      className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                      className="touch-target rounded-lg text-gray-400 hover:text-red-500 transition-colors"
                       title="Delete"
                     >
                       <Trash2 className="w-3.5 h-3.5" />

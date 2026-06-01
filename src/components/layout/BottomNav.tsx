@@ -1,109 +1,104 @@
-import { NavLink, Link } from 'react-router-dom'
+import { useState } from 'react'
+import { NavLink } from 'react-router-dom'
 import { Home, Bell, Archive, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useDueReminders } from '@/hooks/useReminders'
-
-const NAV_ITEMS = [
-  { to: '/',          icon: Home,    label: 'Cases',     end: true  },
-  { to: '/reminders', icon: Bell,    label: 'Reminders', end: false },
-] as const
-
-const NAV_ITEMS_RIGHT = [
-  { to: '/archive', icon: Archive, label: 'Archive', end: false },
-] as const
+import { QuickAddSheet } from '@/components/QuickAddSheet'
 
 export function BottomNav() {
   const { data: dueReminders = [] } = useDueReminders()
   const dueCount = dueReminders.length
+  const [sheetOpen, setSheetOpen] = useState(false)
 
   return (
     <>
-      {/* Floating Action Button — sits above the nav bar */}
-      <Link
-        to="/cases/new"
+      <QuickAddSheet open={sheetOpen} onClose={() => setSheetOpen(false)} />
+
+      {/* FAB — positioned above nav accounting for safe-area-inset-bottom */}
+      <button
+        onClick={() => setSheetOpen(true)}
         aria-label="New case"
         className={cn(
           'fixed z-50 left-1/2 -translate-x-1/2',
-          // bottom-14 = 56 px → FAB bottom aligns with nav top (h-16 = 64px),
-          // then translate-y-2 shifts it 8px into the nav for a connected look
-          'bottom-14 translate-y-2',
           'w-14 h-14 bg-blue-600 rounded-full',
           'flex items-center justify-center',
           'shadow-[0_4px_20px_rgba(37,99,235,0.45)] border-4 border-white',
           'hover:bg-blue-700 active:scale-95 transition-all duration-150',
         )}
+        /* bottom = nav h-16 (64px) + safe area - 8px overlap */
+        style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom) - 8px)' }}
       >
         <Plus className="w-7 h-7 text-white" strokeWidth={2.5} />
-      </Link>
+      </button>
 
-      {/* Tab bar */}
+      {/* Tab bar — 4 equal slots: Cases | Reminders | [FAB gap] | Archive */}
       <nav
         className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-gray-100"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
         <div className="flex h-16 max-w-lg mx-auto">
 
-          {/* Left items */}
-          {NAV_ITEMS.map(({ to, icon: Icon, label, end }) => {
-            const showBadge = to === '/reminders' && dueCount > 0
-            return (
-              <NavLink
-                key={to}
-                to={to}
-                end={end}
-                className={({ isActive }) =>
-                  cn(
-                    'flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors relative',
-                    isActive ? 'text-blue-600' : 'text-gray-400 hover:text-gray-600',
-                  )
-                }
-              >
-                {({ isActive }) => (
-                  <>
-                    <div className="relative">
-                      <Icon className="w-5 h-5" strokeWidth={isActive ? 2.5 : 1.8} />
-                      {showBadge && (
-                        <span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
-                          {dueCount > 9 ? '9+' : dueCount}
-                        </span>
-                      )}
-                    </div>
-                    <span className="text-[10px] font-medium">{label}</span>
-                  </>
-                )}
-              </NavLink>
-            )
-          })}
+          {/* Cases */}
+          <NavLink
+            to="/"
+            end
+            className={({ isActive }) =>
+              cn('flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors',
+                 isActive ? 'text-blue-600' : 'text-gray-400 hover:text-gray-600')
+            }
+          >
+            {({ isActive }) => (
+              <>
+                <Home className="w-5 h-5" strokeWidth={isActive ? 2.5 : 1.8} />
+                <span className="text-[10px] font-medium">Cases</span>
+              </>
+            )}
+          </NavLink>
 
-          {/* Center spacer — reserved for FAB */}
+          {/* Reminders — badge when due */}
+          <NavLink
+            to="/reminders"
+            className={({ isActive }) =>
+              cn('flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors',
+                 isActive ? 'text-blue-600' : 'text-gray-400 hover:text-gray-600')
+            }
+          >
+            {({ isActive }) => (
+              <>
+                <div className="relative">
+                  <Bell className="w-5 h-5" strokeWidth={isActive ? 2.5 : 1.8} />
+                  {dueCount > 0 && (
+                    <span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                      {dueCount > 9 ? '9+' : dueCount}
+                    </span>
+                  )}
+                </div>
+                <span className="text-[10px] font-medium">Reminders</span>
+              </>
+            )}
+          </NavLink>
+
+          {/* Center gap for FAB + "New" label */}
           <div className="flex-1 flex flex-col items-center justify-end pb-2">
             <span className="text-[10px] font-semibold text-blue-500 tracking-wide">New</span>
           </div>
 
-          {/* Right items */}
-          {NAV_ITEMS_RIGHT.map(({ to, icon: Icon, label, end }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={end}
-              className={({ isActive }) =>
-                cn(
-                  'flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors',
-                  isActive ? 'text-blue-600' : 'text-gray-400 hover:text-gray-600',
-                )
-              }
-            >
-              {({ isActive }) => (
-                <>
-                  <Icon className="w-5 h-5" strokeWidth={isActive ? 2.5 : 1.8} />
-                  <span className="text-[10px] font-medium">{label}</span>
-                </>
-              )}
-            </NavLink>
-          ))}
+          {/* Archive */}
+          <NavLink
+            to="/archive"
+            className={({ isActive }) =>
+              cn('flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors',
+                 isActive ? 'text-blue-600' : 'text-gray-400 hover:text-gray-600')
+            }
+          >
+            {({ isActive }) => (
+              <>
+                <Archive className="w-5 h-5" strokeWidth={isActive ? 2.5 : 1.8} />
+                <span className="text-[10px] font-medium">Archive</span>
+              </>
+            )}
+          </NavLink>
 
-          {/* Empty right slot to balance the 2-left / 1-center / 1-right layout */}
-          <div className="flex-1" />
         </div>
       </nav>
     </>

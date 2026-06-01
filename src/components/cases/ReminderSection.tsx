@@ -126,9 +126,9 @@ export function ReminderSection({ caseId }: Props) {
                 <button
                   onClick={() => handleDelete(reminder.id)}
                   disabled={deleteReminder.isPending}
-                  className="shrink-0 p-1 text-gray-400 hover:text-red-500 transition-colors"
+                  className="touch-target shrink-0 rounded-lg text-gray-400 hover:text-red-500 transition-colors"
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
+                  <Trash2 className="w-4 h-4" />
                 </button>
               </div>
             )
