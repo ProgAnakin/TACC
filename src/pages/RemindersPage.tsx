@@ -1,5 +1,5 @@
-import { useEffect } from 'react'
-import { Bell, BellOff, Trash2, ExternalLink } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Bell, BellOff, Trash2, ExternalLink, Play, Smartphone, Volume2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { format, isPast, isToday, isTomorrow } from 'date-fns'
 import { toast } from 'sonner'
@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useReminders, useDeleteReminder, useMarkReminderSent } from '@/hooks/useReminders'
 import { requestPermission, getPermission, scheduleReminderCheck, isNotificationSupported } from '@/lib/notifications'
+import { usePushSubscription } from '@/hooks/usePushSubscription'
+import { SOUNDS, getSoundPreference, setSoundPreference, playSound, type SoundType } from '@/lib/sounds'
 import type { Reminder } from '@/types'
 
 function getReminderLabel(dateStr: string): string {
@@ -20,10 +22,19 @@ function getReminderLabel(dateStr: string): string {
 export default function RemindersPage() {
   const { data: reminders = [], isLoading } = useReminders()
   const deleteReminder = useDeleteReminder()
-  const markSent = useMarkReminderSent()
+  const markSent       = useMarkReminderSent()
+  const push           = usePushSubscription()
 
-  const permission = getPermission()
+  const permission    = getPermission()
   const notifSupported = isNotificationSupported()
+
+  const [soundPref, setSoundPref] = useState<SoundType>(getSoundPreference)
+
+  const handleSoundChange = (type: SoundType) => {
+    setSoundPref(type)
+    setSoundPreference(type)
+    playSound(type)
+  }
 
   const handleEnableNotifications = async () => {
     const result = await requestPermission()
@@ -32,6 +43,18 @@ export default function RemindersPage() {
     } else if (result === 'denied') {
       toast.error('Permission denied. Enable notifications in your browser settings.')
     }
+  }
+
+  const handleEnablePush = async () => {
+    const result = await push.enable()
+    if (result === 'ok')     toast.success('Push notifications enabled!')
+    else if (result === 'denied') toast.error('Notification permission denied')
+    else                          toast.error('Could not subscribe to push notifications')
+  }
+
+  const handleDisablePush = async () => {
+    await push.disable()
+    toast.success('Push notifications disabled')
   }
 
   const handleDelete = async (id: string) => {
@@ -59,7 +82,7 @@ export default function RemindersPage() {
   }, [reminders])
 
   const upcoming = reminders.filter((r) => !r.sent && !isPast(new Date(r.remind_at)))
-  const past     = reminders.filter((r) => r.sent  ||  isPast(new Date(r.remind_at)))
+  const past     = reminders.filter((r) =>  r.sent ||  isPast(new Date(r.remind_at)))
 
   type ReminderWithCase = Reminder & {
     case?: { client_name: string; product_name: string | null; category: string }
@@ -107,7 +130,8 @@ export default function RemindersPage() {
       <Header title="Reminders" />
 
       <div className="px-4 py-4 space-y-4 pb-28">
-        {/* Notification status banner — honest about the iPhone reality */}
+
+        {/* Notification permission banner */}
         {!notifSupported ? (
           <div className="bg-blue-50 border border-blue-100 rounded-xl p-3.5 flex items-start gap-3">
             <Bell className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
@@ -139,6 +163,7 @@ export default function RemindersPage() {
           </div>
         )}
 
+        {/* Reminder list */}
         {isLoading ? (
           <div className="space-y-3">
             {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-20 rounded-xl" />)}
@@ -169,6 +194,82 @@ export default function RemindersPage() {
             )}
           </>
         )}
+
+        {/* ── Notification Settings ─────────────────────── */}
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm divide-y divide-gray-50 mt-2">
+
+          {/* Push notifications */}
+          <div className="p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Smartphone className="w-4 h-4 text-blue-500" />
+                <p className="text-sm font-semibold text-gray-800">Push Notifications</p>
+              </div>
+              {push.status === 'loading' ? null : push.status === 'unsupported' ? (
+                <span className="text-xs text-gray-400 bg-gray-50 border border-gray-100 px-2 py-1 rounded-lg">Not available</span>
+              ) : push.status === 'subscribed' ? (
+                <button
+                  onClick={handleDisablePush}
+                  className="text-xs text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100 border border-red-100 px-3 py-1.5 rounded-lg transition-colors font-medium"
+                >
+                  Disable
+                </button>
+              ) : (
+                <button
+                  onClick={handleEnablePush}
+                  className="text-xs text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-100 px-3 py-1.5 rounded-lg transition-colors font-medium"
+                >
+                  Enable
+                </button>
+              )}
+            </div>
+            <p className="text-xs text-gray-400 leading-relaxed">
+              {push.status === 'subscribed'
+                ? '✓ You\'ll receive notifications even when the app is closed.'
+                : push.status === 'unsupported'
+                ? 'Add this app to your Home Screen to unlock push notifications (iOS 16.4+).'
+                : 'Receive notifications when the app is in the background or closed.'}
+            </p>
+            {push.status !== 'subscribed' && push.status !== 'unsupported' && (
+              <p className="text-[11px] text-amber-600 bg-amber-50 border border-amber-100 rounded-lg px-2.5 py-1.5">
+                iPhone: requires the app added to Home Screen. Sound = your phone's notification tone.
+              </p>
+            )}
+          </div>
+
+          {/* In-app sound */}
+          <div className="p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <Volume2 className="w-4 h-4 text-purple-500" />
+              <p className="text-sm font-semibold text-gray-800">Alert Sound</p>
+              <span className="text-xs text-gray-400">(while app is open)</span>
+            </div>
+            <div className="grid grid-cols-4 gap-2">
+              {SOUNDS.map(({ type, label, emoji }) => (
+                <button
+                  key={type}
+                  onClick={() => handleSoundChange(type)}
+                  className={`flex flex-col items-center gap-1 py-2.5 px-1 rounded-xl border text-xs font-semibold transition-all active:scale-95 ${
+                    soundPref === type
+                      ? 'bg-purple-600 border-purple-600 text-white shadow-sm'
+                      : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-purple-50 hover:border-purple-200 hover:text-purple-700'
+                  }`}
+                >
+                  <span className="text-base leading-none">{emoji}</span>
+                  <span>{label}</span>
+                  {soundPref !== type && (
+                    <Play className="w-2.5 h-2.5 opacity-50" />
+                  )}
+                </button>
+              ))}
+            </div>
+            <p className="text-[11px] text-gray-400">
+              Tap to preview. Background notifications use your phone's notification sound.
+            </p>
+          </div>
+
+        </div>
+
       </div>
     </>
   )

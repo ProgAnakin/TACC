@@ -1,3 +1,5 @@
+import { playSound, getSoundPreference } from './sounds'
+
 /** Whether the browser exposes the Notification API at all.
  *  iOS Safari in a normal tab does NOT — only installed PWAs on iOS 16.4+. */
 export function isNotificationSupported(): boolean {
@@ -10,7 +12,7 @@ export function getPermission(): NotificationPermission {
 }
 
 export async function requestPermission(): Promise<NotificationPermission> {
-  if (typeof window === 'undefined' || !('Notification' in window)) return 'denied'
+  if (!isNotificationSupported()) return 'denied'
   return Notification.requestPermission()
 }
 
@@ -18,8 +20,8 @@ export function showNotification(title: string, body: string) {
   if (getPermission() !== 'granted') return
   new Notification(title, {
     body,
-    icon: '/icons/icon-192x192.png',
-    badge: '/icons/icon-72x72.png',
+    icon: '/pwa-192x192.png',
+    badge: '/pwa-192x192.png',
     tag: 'caderninho-reminder',
   })
 }
@@ -32,13 +34,14 @@ export function scheduleReminderCheck(
     const now = new Date()
     reminders.forEach((reminder) => {
       if (reminder.sent) return
-      const remindAt = new Date(reminder.remind_at)
-      if (remindAt <= now) {
+      if (new Date(reminder.remind_at) <= now) {
+        // Play in-app sound (works while app is open regardless of OS permissions)
+        playSound(getSoundPreference())
         showNotification('⏰ Lembrete — Caderninho Digital', reminder.title)
         onFire(reminder.id)
       }
     })
-  }, 30_000) // check every 30s
+  }, 30_000)
 
   return () => clearInterval(intervalId)
 }
