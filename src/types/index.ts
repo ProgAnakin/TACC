@@ -49,6 +49,16 @@ export interface Reminder {
   case?: Case
 }
 
+export interface CasePhoto {
+  id: string
+  case_id: string
+  user_id: string
+  storage_path: string
+  created_at: string
+}
+
+export const MAX_PHOTOS_PER_CASE = 5
+
 /* ------------------------------------------------------------------ */
 /*  Display constants                                                  */
 /* ------------------------------------------------------------------ */

@@ -99,6 +99,39 @@ export function downloadCasesCSV(cases: Array<Record<string, unknown>>, filename
   URL.revokeObjectURL(url)
 }
 
+/** Resize + compress an image file in the browser before upload.
+ *  Phone photos are often 3-8MB; this shrinks them to ~100-300KB JPEGs. */
+export async function compressImage(
+  file: File,
+  maxDimension = 1280,
+  quality = 0.8,
+): Promise<Blob> {
+  const bitmap = await createImageBitmap(file)
+  let { width, height } = bitmap
+  if (width > maxDimension || height > maxDimension) {
+    const scale = maxDimension / Math.max(width, height)
+    width  = Math.round(width * scale)
+    height = Math.round(height * scale)
+  }
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  const ctx = canvas.getContext('2d')
+  if (!ctx) {
+    bitmap.close()
+    return file
+  }
+  ctx.drawImage(bitmap, 0, 0, width, height)
+  bitmap.close()
+  return new Promise((resolve) => {
+    canvas.toBlob(
+      (blob) => resolve(blob ?? file),
+      'image/jpeg',
+      quality,
+    )
+  })
+}
+
 /** Parse contact type prefix from notes string. */
 export type ContactType = 'call' | 'visit' | 'message' | 'whatsapp'
 

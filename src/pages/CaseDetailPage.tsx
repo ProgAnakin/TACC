@@ -14,6 +14,7 @@ import { UrgencyBadge } from '@/components/cases/UrgencyBadge'
 import { ServiceStatusBar } from '@/components/cases/ServiceStatusBar'
 import { CallLogSection } from '@/components/cases/CallLogSection'
 import { ReminderSection } from '@/components/cases/ReminderSection'
+import { PhotoSection } from '@/components/cases/PhotoSection'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -538,6 +539,11 @@ export default function CaseDetailPage() {
             </Dialog>
           </>
         )}
+
+        {/* Photos */}
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+          <PhotoSection caseId={id!} />
+        </div>
 
         {/* Call log */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">

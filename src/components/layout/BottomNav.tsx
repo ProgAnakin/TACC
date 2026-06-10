@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import { Home, Bell, Archive, Plus } from 'lucide-react'
+import { Home, Bell, Archive, Plus, BarChart3 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useDueReminders } from '@/hooks/useReminders'
 import { QuickAddSheet } from '@/components/QuickAddSheet'
@@ -31,7 +31,7 @@ export function BottomNav() {
         <Plus className="w-7 h-7 text-white" strokeWidth={2.5} />
       </button>
 
-      {/* Tab bar — 4 equal slots: Cases | Reminders | [FAB gap] | Archive */}
+      {/* Tab bar — 5 slots: Cases | Reminders | [FAB gap] | Stats | Archive */}
       <nav
         className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-gray-100"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
@@ -82,6 +82,22 @@ export function BottomNav() {
           <div className="flex-1 flex flex-col items-center justify-end pb-2">
             <span className="text-[10px] font-semibold text-blue-500 tracking-wide">New</span>
           </div>
+
+          {/* Stats */}
+          <NavLink
+            to="/stats"
+            className={({ isActive }) =>
+              cn('flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors',
+                 isActive ? 'text-blue-600' : 'text-gray-400 hover:text-gray-600')
+            }
+          >
+            {({ isActive }) => (
+              <>
+                <BarChart3 className="w-5 h-5" strokeWidth={isActive ? 2.5 : 1.8} />
+                <span className="text-[10px] font-medium">Stats</span>
+              </>
+            )}
+          </NavLink>
 
           {/* Archive */}
           <NavLink

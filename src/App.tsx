@@ -12,6 +12,7 @@ const CaseDetailPage = lazy(() => import('@/pages/CaseDetailPage'))
 const CaseFormPage   = lazy(() => import('@/pages/CaseFormPage'))
 const RemindersPage  = lazy(() => import('@/pages/RemindersPage'))
 const ArchivePage    = lazy(() => import('@/pages/ArchivePage'))
+const StatsPage      = lazy(() => import('@/pages/StatsPage'))
 
 function PageFallback() {
   return (
@@ -93,6 +94,7 @@ export default function App() {
         >
           <Route index element={<HomePage />} />
           <Route path="reminders" element={<Suspense fallback={<PageFallback />}><RemindersPage /></Suspense>} />
+          <Route path="stats" element={<Suspense fallback={<PageFallback />}><StatsPage /></Suspense>} />
           <Route path="archive" element={<Suspense fallback={<PageFallback />}><ArchivePage /></Suspense>} />
           <Route path="cases/new" element={<Suspense fallback={<PageFallback />}><CaseFormPage /></Suspense>} />
           <Route path="cases/:id" element={<Suspense fallback={<PageFallback />}><CaseDetailPage /></Suspense>} />
