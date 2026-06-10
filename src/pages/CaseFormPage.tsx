@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -84,7 +84,15 @@ type FormData = z.infer<typeof schema>
 export default function CaseFormPage() {
   const navigate  = useNavigate()
   const { id }    = useParams()
+  const location  = useLocation()
   const isEditing = !!id
+
+  // Values typed in the QuickAddSheet before jumping to the full form
+  const prefill = (location.state ?? {}) as {
+    client_name?: string
+    client_phone?: string
+    category?: Category
+  }
 
   const { data: existingCase, isLoading: loadingCase } = useCase(id)
   const createCase = useCreateCase()
@@ -99,7 +107,12 @@ export default function CaseFormPage() {
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { category: 'arrival', urgency: 'normal' },
+    defaultValues: {
+      category:     prefill.category ?? 'arrival',
+      urgency:      'normal',
+      client_name:  prefill.client_name ?? '',
+      client_phone: prefill.client_phone ?? '',
+    },
   })
 
   const watchedCategory = watch('category')

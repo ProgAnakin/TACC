@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Phone, Mail, Clock, PhoneCall, MessageCircle, CalendarClock, Copy } from 'lucide-react'
-import { formatDistanceToNow, isPast, format } from 'date-fns'
+import { Phone, Mail, Clock, PhoneCall, MessageCircle, CalendarClock, Copy, PhoneOff } from 'lucide-react'
+import { formatDistanceToNow, isPast, format, differenceInDays } from 'date-fns'
 import { toast } from 'sonner'
 import { cn, buildWhatsAppUrl, caseAgeBorderClass, caseAgeLabel, copyToClipboard, shortCaseId } from '@/lib/utils'
 import type { Case } from '@/types'
@@ -43,6 +43,8 @@ export function CaseCard({ case_, className }: Props) {
   const ageBorder      = caseAgeBorderClass(case_.created_at)
   const hasWhatsApp    = !!case_.client_phone
   const expectedPast   = case_.expected_date && isPast(new Date(case_.expected_date))
+  const neverContacted = case_.call_count === 0 &&
+    differenceInDays(new Date(), new Date(case_.created_at)) >= 1
 
   const lastContact = case_.last_contact_at
     ? `${formatDistanceToNow(new Date(case_.last_contact_at))} ago`
@@ -97,11 +99,16 @@ export function CaseCard({ case_, className }: Props) {
             {age.text}
           </span>
 
-          {case_.call_count > 0 && (
+          {case_.call_count > 0 ? (
             <span className="flex items-center gap-1 text-blue-500">
               <PhoneCall className="w-3 h-3" />
               {case_.call_count} {case_.call_count === 1 ? 'call' : 'calls'}
               {lastContact && <span className="text-gray-400">· {lastContact}</span>}
+            </span>
+          ) : neverContacted && (
+            <span className="flex items-center gap-1 text-amber-600 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded-md font-medium">
+              <PhoneOff className="w-3 h-3" />
+              No contact yet
             </span>
           )}
 

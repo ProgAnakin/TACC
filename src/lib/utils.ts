@@ -74,6 +74,31 @@ export async function copyToClipboard(text: string): Promise<boolean> {
   }
 }
 
+/** Downloads cases as a CSV file (Excel-compatible, UTF-8 BOM). */
+export function downloadCasesCSV(cases: Array<Record<string, unknown>>, filename: string): void {
+  const columns = [
+    'client_name', 'client_phone', 'client_email', 'category', 'status',
+    'urgency', 'product_name', 'shopify_order', 'cause', 'notes',
+    'deal_value', 'lead_outcome', 'call_count', 'created_at', 'resolved_at',
+  ]
+  const escape = (v: unknown) => {
+    if (v == null) return ''
+    const s = String(v)
+    return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
+  }
+  const rows = [
+    columns.join(','),
+    ...cases.map((c) => columns.map((col) => escape(c[col])).join(',')),
+  ]
+  const blob = new Blob(['﻿' + rows.join('\n')], { type: 'text/csv;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
 /** Parse contact type prefix from notes string. */
 export type ContactType = 'call' | 'visit' | 'message' | 'whatsapp'
 

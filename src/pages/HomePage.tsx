@@ -6,7 +6,7 @@ import { Header } from '@/components/layout/Header'
 import { CaseCard } from '@/components/cases/CaseCard'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useCases, useCaseStats } from '@/hooks/useCases'
+import { useCases, useCaseStats, applySorting } from '@/hooks/useCases'
 import { useDueReminders, useMarkReminderSent } from '@/hooks/useReminders'
 import { usePWAInstall } from '@/hooks/usePWAInstall'
 import { IOSInstallCard } from '@/components/IOSInstallCard'
@@ -48,14 +48,26 @@ export default function HomePage() {
   const [showSort, setShowSort]     = useState(false)
   const [showLegend, setShowLegend] = useState(false)
 
-  const { data: cases = [], isLoading, error } = useCases({
-    status:   'open',
-    category: activeTab === 'all' ? undefined : activeTab,
-    search:   search || undefined,
-    sortBy,
-  })
+  // Single fetch of all open cases; tab/search/sort happen client-side so
+  // typing in the search box filters instantly with no network round-trip.
+  const { data: allOpenCases = [], isLoading, error } = useCases({ status: 'open' })
 
-  const { data: allOpenCases = [] } = useCases({ status: 'open' })
+  const cases = useMemo(() => {
+    let result = allOpenCases
+    if (activeTab !== 'all') {
+      result = result.filter((c) => c.category === activeTab)
+    }
+    if (search.trim()) {
+      const term = search.trim().toLowerCase()
+      result = result.filter((c) =>
+        c.client_name.toLowerCase().includes(term) ||
+        (c.client_phone ?? '').toLowerCase().includes(term) ||
+        (c.shopify_order ?? '').toLowerCase().includes(term) ||
+        (c.product_name ?? '').toLowerCase().includes(term),
+      )
+    }
+    return applySorting(result, sortBy)
+  }, [allOpenCases, activeTab, search, sortBy])
 
   const { data: stats } = useCaseStats()
   const { data: dueReminders = [] } = useDueReminders()

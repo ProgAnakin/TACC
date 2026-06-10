@@ -1,14 +1,25 @@
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { Toaster } from 'sonner'
 import { useAuth } from '@/hooks/useAuth'
 import LoginPage from '@/pages/LoginPage'
 import HomePage from '@/pages/HomePage'
-import CaseDetailPage from '@/pages/CaseDetailPage'
-import CaseFormPage from '@/pages/CaseFormPage'
-import RemindersPage from '@/pages/RemindersPage'
-import ArchivePage from '@/pages/ArchivePage'
 import Layout from '@/components/layout/Layout'
+
+// Secondary pages load on demand — keeps the startup bundle small
+const CaseDetailPage = lazy(() => import('@/pages/CaseDetailPage'))
+const CaseFormPage   = lazy(() => import('@/pages/CaseFormPage'))
+const RemindersPage  = lazy(() => import('@/pages/RemindersPage'))
+const ArchivePage    = lazy(() => import('@/pages/ArchivePage'))
+
+function PageFallback() {
+  return (
+    <div className="flex items-center justify-center py-24">
+      <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+    </div>
+  )
+}
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
@@ -81,11 +92,11 @@ export default function App() {
           }
         >
           <Route index element={<HomePage />} />
-          <Route path="reminders" element={<RemindersPage />} />
-          <Route path="archive" element={<ArchivePage />} />
-          <Route path="cases/new" element={<CaseFormPage />} />
-          <Route path="cases/:id" element={<CaseDetailPage />} />
-          <Route path="cases/:id/edit" element={<CaseFormPage />} />
+          <Route path="reminders" element={<Suspense fallback={<PageFallback />}><RemindersPage /></Suspense>} />
+          <Route path="archive" element={<Suspense fallback={<PageFallback />}><ArchivePage /></Suspense>} />
+          <Route path="cases/new" element={<Suspense fallback={<PageFallback />}><CaseFormPage /></Suspense>} />
+          <Route path="cases/:id" element={<Suspense fallback={<PageFallback />}><CaseDetailPage /></Suspense>} />
+          <Route path="cases/:id/edit" element={<Suspense fallback={<PageFallback />}><CaseFormPage /></Suspense>} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

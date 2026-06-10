@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Search, X, Archive, RotateCcw, Loader2 } from 'lucide-react'
+import { Search, X, Archive, RotateCcw, Loader2, Download } from 'lucide-react'
 import { format, differenceInDays } from 'date-fns'
 import { toast } from 'sonner'
 import { Link } from 'react-router-dom'
@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { CategoryBadge } from '@/components/cases/CategoryBadge'
 import { useCases, useUpdateCase } from '@/hooks/useCases'
+import { downloadCasesCSV } from '@/lib/utils'
 import { LEAD_OUTCOME_LABELS, LEAD_OUTCOME_COLORS } from '@/types'
 
 export default function ArchivePage() {
@@ -47,9 +48,33 @@ export default function ArchivePage() {
     }
   }
 
+  const handleExport = () => {
+    if (!cases.length) {
+      toast.error('Nothing to export')
+      return
+    }
+    const today = format(new Date(), 'yyyy-MM-dd')
+    downloadCasesCSV(cases as unknown as Array<Record<string, unknown>>, `caderninho-archive-${today}.csv`)
+    toast.success(`${cases.length} cases exported`)
+  }
+
   return (
     <>
-      <Header title="Archive" />
+      <Header
+        title="Archive"
+        rightElement={
+          cases.length > 0 ? (
+            <button
+              onClick={handleExport}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-medium transition-colors"
+              title="Export CSV"
+            >
+              <Download className="w-3.5 h-3.5" />
+              CSV
+            </button>
+          ) : undefined
+        }
+      />
 
       <div className="px-4 py-4 space-y-4 pb-28">
         {/* Search */}

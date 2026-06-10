@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/dialog'
 import { useCase, useDeleteCase, useResolveCase, useUpdateCase } from '@/hooks/useCases'
 import { useCreateReminder } from '@/hooks/useReminders'
-import { generateAssistancePDF, type PdfLocale } from '@/lib/pdf'
+import type { PdfLocale } from '@/lib/pdf'
 import { buildWhatsAppUrl, copyToClipboard, shortCaseId } from '@/lib/utils'
 import { Textarea } from '@/components/ui/textarea'
 import type { ServiceStatus, LeadOutcome } from '@/types'
@@ -158,9 +158,11 @@ export default function CaseDetailPage() {
     }
   }
 
-  const handlePDF = (locale: PdfLocale) => {
+  const handlePDF = async (locale: PdfLocale) => {
     if (!case_) return
     try {
+      // jsPDF (~370KB) is only downloaded the first time someone exports a PDF
+      const { generateAssistancePDF } = await import('@/lib/pdf')
       generateAssistancePDF(case_, locale)
       setPdfDialogOpen(false)
       toast.success('PDF downloaded!')

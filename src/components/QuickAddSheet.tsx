@@ -174,9 +174,18 @@ export function QuickAddSheet({ open, onClose }: Props) {
             }
           </button>
 
-          <p className="text-center text-xs text-gray-400">
-            Add more details after creating
-          </p>
+          <button
+            type="button"
+            onClick={() => {
+              handleClose()
+              navigate('/cases/new', {
+                state: { client_name: name.trim(), client_phone: phone.trim(), category },
+              })
+            }}
+            className="w-full text-center text-xs text-blue-600 hover:text-blue-700 font-medium py-2"
+          >
+            Need more fields? Open full form →
+          </button>
         </div>
       </div>
     </>

@@ -18,7 +18,7 @@ const URGENCY_ORDER: Record<Urgency, number> = {
   low: 3,
 }
 
-function applySorting(cases: Case[], sortBy?: string): Case[] {
+export function applySorting(cases: Case[], sortBy?: string): Case[] {
   const sorted = [...cases]
   switch (sortBy) {
     case 'oldest':
