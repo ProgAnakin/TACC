@@ -1,7 +1,8 @@
-import { useState, useMemo } from 'react'
-import { Search, SlidersHorizontal, X, AlertTriangle, ChevronDown, AlertCircle, Download } from 'lucide-react'
+import { useState, useMemo, useCallback } from 'react'
+import { Search, SlidersHorizontal, X, AlertTriangle, ChevronDown, AlertCircle, Download, RotateCcw } from 'lucide-react'
 import { differenceInDays, isPast } from 'date-fns'
 import { Link } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import { Header } from '@/components/layout/Header'
 import { CaseCard } from '@/components/cases/CaseCard'
 import { Input } from '@/components/ui/input'
@@ -9,9 +10,11 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useCases, useCaseStats, applySorting } from '@/hooks/useCases'
 import { useDueReminders, useMarkReminderSent } from '@/hooks/useReminders'
 import { usePWAInstall } from '@/hooks/usePWAInstall'
+import { usePullToRefresh } from '@/hooks/usePullToRefresh'
 import { IOSInstallCard } from '@/components/IOSInstallCard'
 import { toast } from 'sonner'
 import { Bell, Check } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import type { Category } from '@/types'
 import { CATEGORY_SHORT } from '@/types'
 
@@ -47,6 +50,15 @@ export default function HomePage() {
   const [sortBy, setSortBy]         = useState<SortValue>('newest')
   const [showSort, setShowSort]     = useState(false)
   const [showLegend, setShowLegend] = useState(false)
+
+  const queryClient = useQueryClient()
+  const handleRefresh = useCallback(async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ['cases'] }),
+      queryClient.invalidateQueries({ queryKey: ['case-stats'] }),
+    ])
+  }, [queryClient])
+  const { onTouchStart, onTouchMove, onTouchEnd, pullProgress, isRefreshing } = usePullToRefresh({ onRefresh: handleRefresh })
 
   // Single fetch of all open cases; tab/search/sort happen client-side so
   // typing in the search box filters instantly with no network round-trip.
@@ -119,6 +131,10 @@ export default function HomePage() {
 
   const currentSortLabel = SORT_OPTIONS.find((o) => o.value === sortBy)?.label ?? 'Sort'
 
+  const indicatorOpacity = pullProgress
+  const indicatorY = pullProgress * 36
+  const indicatorScale = 0.5 + pullProgress * 0.5
+
   return (
     <>
       <Header
@@ -135,7 +151,31 @@ export default function HomePage() {
         }
       />
 
-      <div className="px-4 pt-4 space-y-3 pb-32">
+      {/* Pull-to-refresh indicator */}
+      <div
+        aria-hidden="true"
+        className="fixed left-1/2 -translate-x-1/2 z-40 pointer-events-none"
+        style={{
+          top: 'calc(3.5rem + env(safe-area-inset-top) + 6px)',
+          opacity: indicatorOpacity,
+          transform: `translateY(${indicatorY}px) scale(${indicatorScale})`,
+          transition: pullProgress === 0 && !isRefreshing ? 'opacity 0.2s ease-out, transform 0.2s ease-out' : 'none',
+        }}
+      >
+        <div className={cn(
+          'w-9 h-9 bg-white rounded-full shadow-lg border border-gray-200 flex items-center justify-center',
+          isRefreshing && 'animate-spin',
+        )}>
+          <RotateCcw className="w-4 h-4 text-blue-500" />
+        </div>
+      </div>
+
+      <div
+        className="px-4 pt-4 space-y-3 pb-32"
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
 
         {/* DB not set up warning */}
         {dbMissing && (

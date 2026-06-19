@@ -13,29 +13,37 @@ import { LEAD_OUTCOME_LABELS, LEAD_OUTCOME_COLORS } from '@/types'
 
 export default function ArchivePage() {
   const [search, setSearch] = useState('')
-  const { data: cases = [], isLoading } = useCases({
-    status: 'resolved',
-    search: search || undefined,
-    sortBy: 'newest',
-  })
+  // Fetch all resolved cases once; search filters client-side for instant results
+  const { data: allResolved = [], isLoading } = useCases({ status: 'resolved', sortBy: 'newest' })
   const updateCase = useUpdateCase()
 
-  const insights = useMemo(() => {
-    if (!cases.length) return null
+  const cases = useMemo(() => {
+    if (!search.trim()) return allResolved
+    const term = search.trim().toLowerCase()
+    return allResolved.filter(c =>
+      c.client_name.toLowerCase().includes(term) ||
+      (c.client_phone ?? '').toLowerCase().includes(term) ||
+      (c.product_name ?? '').toLowerCase().includes(term) ||
+      (c.shopify_order ?? '').toLowerCase().includes(term),
+    )
+  }, [allResolved, search])
 
-    const serviceCases = cases.filter(c => c.category === 'assistance' && c.resolved_at && c.created_at)
+  const insights = useMemo(() => {
+    if (!allResolved.length) return null
+
+    const serviceCases = allResolved.filter(c => c.category === 'assistance' && c.resolved_at && c.created_at)
     const avgDays = serviceCases.length
       ? Math.round(serviceCases.reduce((sum, c) => {
           return sum + differenceInDays(new Date(c.resolved_at!), new Date(c.created_at))
         }, 0) / serviceCases.length)
       : null
 
-    const leads = cases.filter(c => c.category === 'lead')
+    const leads = allResolved.filter(c => c.category === 'lead')
     const converted = leads.filter(c => c.lead_outcome === 'converted').length
     const convRate = leads.length ? Math.round((converted / leads.length) * 100) : null
 
     return { avgDays, convRate, leads: leads.length, converted }
-  }, [cases])
+  }, [allResolved])
 
   const handleReopen = async (id: string, e: React.MouseEvent) => {
     e.preventDefault()
@@ -96,7 +104,7 @@ export default function ArchivePage() {
           )}
         </div>
 
-        {insights && !search && cases.length > 0 && (
+        {insights && allResolved.length > 0 && (
           <div className="grid grid-cols-3 gap-2">
             <div className="bg-white rounded-xl border border-gray-100 p-3 text-center shadow-sm">
               <div className="text-xl font-bold text-gray-700">{cases.length}</div>

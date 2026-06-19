@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { TrendingUp, Target, Euro, Clock, Package, PhoneCall, Trophy } from 'lucide-react'
+import { TrendingUp, Target, Euro, Clock, Package, PhoneCall, Trophy, TrendingDown } from 'lucide-react'
 import { Header } from '@/components/layout/Header'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useStats, type StatsPeriod } from '@/hooks/useStats'
 import { CATEGORY_SHORT, type Category } from '@/types'
 
 const PERIODS: { value: StatsPeriod; label: string }[] = [
+  { value: 'this_week',  label: 'This week'  },
   { value: 'this_month', label: 'This month' },
   { value: 'last_month', label: 'Last month' },
   { value: 'all',        label: 'All time'   },
@@ -22,33 +23,63 @@ function formatEuro(n: number): string {
   return n.toLocaleString('it-IT', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0, maximumFractionDigits: 0 })
 }
 
+function DeltaBadge({ value, isRevenue = false }: { value: number | null; isRevenue?: boolean }) {
+  if (value === null || value === 0) return null
+  const positive = value > 0
+  const label = isRevenue ? formatEuro(Math.abs(value)) : String(Math.abs(value))
+  return (
+    <span className={`inline-flex items-center gap-0.5 text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
+      positive ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-500'
+    }`}>
+      {positive
+        ? <TrendingUp className="w-2.5 h-2.5" />
+        : <TrendingDown className="w-2.5 h-2.5" />}
+      {positive ? '+' : '-'}{label}
+    </span>
+  )
+}
+
 export default function StatsPage() {
-  const [period, setPeriod] = useState<StatsPeriod>('this_month')
+  const [period, setPeriod] = useState<StatsPeriod>('this_week')
   const { data: stats, isLoading } = useStats(period)
 
   const categoryTotal = stats
     ? Object.values(stats.byCategory).reduce((a, b) => a + b, 0)
     : 0
 
+  const prevLabel = period === 'this_week'
+    ? 'vs last week'
+    : period === 'this_month'
+    ? 'vs last month'
+    : period === 'last_month'
+    ? 'vs prev. month'
+    : null
+
   return (
     <>
       <Header title="Statistics" subtitle="Your performance at a glance" />
 
       <div className="px-4 py-4 space-y-4 pb-28">
-        {/* Period selector */}
-        <div className="flex bg-gray-100 rounded-xl p-1">
+        {/* Period selector — scrollable pills */}
+        <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
           {PERIODS.map((p) => (
             <button
               key={p.value}
               onClick={() => setPeriod(p.value)}
-              className={`flex-1 text-sm font-medium py-2 rounded-lg transition-all ${
-                period === p.value ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+              className={`shrink-0 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all ${
+                period === p.value
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'bg-white text-gray-500 border border-gray-200 hover:text-gray-700'
               }`}
             >
               {p.label}
             </button>
           ))}
         </div>
+
+        {prevLabel && (
+          <p className="text-[11px] text-gray-400 -mt-2 px-0.5">Deltas shown {prevLabel}</p>
+        )}
 
         {isLoading || !stats ? (
           <div className="space-y-3">
@@ -65,13 +96,19 @@ export default function StatsPage() {
                 <div className="flex items-center gap-1.5 text-gray-400 text-xs font-medium mb-1">
                   <Package className="w-3.5 h-3.5" /> New cases
                 </div>
-                <p className="text-3xl font-bold text-gray-900">{stats.created}</p>
+                <div className="flex items-end gap-2">
+                  <p className="text-3xl font-bold text-gray-900">{stats.created}</p>
+                  <div className="mb-1"><DeltaBadge value={stats.delta.created} /></div>
+                </div>
               </div>
               <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
                 <div className="flex items-center gap-1.5 text-gray-400 text-xs font-medium mb-1">
                   <TrendingUp className="w-3.5 h-3.5" /> Resolved
                 </div>
-                <p className="text-3xl font-bold text-green-600">{stats.resolved}</p>
+                <div className="flex items-end gap-2">
+                  <p className="text-3xl font-bold text-green-600">{stats.resolved}</p>
+                  <div className="mb-1"><DeltaBadge value={stats.delta.resolved} /></div>
+                </div>
               </div>
               <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
                 <div className="flex items-center gap-1.5 text-gray-400 text-xs font-medium mb-1">
@@ -88,7 +125,10 @@ export default function StatsPage() {
                 <div className="flex items-center gap-1.5 text-gray-400 text-xs font-medium mb-1">
                   <Euro className="w-3.5 h-3.5" /> Revenue
                 </div>
-                <p className="text-3xl font-bold text-green-700">{formatEuro(stats.revenue)}</p>
+                <div className="flex items-end gap-2 flex-wrap">
+                  <p className="text-2xl font-bold text-green-700">{formatEuro(stats.revenue)}</p>
+                  <div className="mb-0.5"><DeltaBadge value={stats.delta.revenue} isRevenue /></div>
+                </div>
                 <p className="text-[11px] text-gray-400 mt-0.5">from converted leads</p>
               </div>
             </div>
