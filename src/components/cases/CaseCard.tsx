@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { Phone, Mail, Clock, PhoneCall, MessageCircle, CalendarClock, Copy, PhoneOff } from 'lucide-react'
 import { formatDistanceToNow, isPast, format, differenceInDays } from 'date-fns'
 import { toast } from 'sonner'
-import { cn, buildWhatsAppUrl, caseAgeBorderClass, caseAgeLabel, copyToClipboard, shortCaseId } from '@/lib/utils'
+import { cn, buildWhatsAppUrl, caseAgeBorderClass, caseAgeLabel, copyToClipboard, shortCaseId, parseLocalDate } from '@/lib/utils'
 import type { Case } from '@/types'
 import { CategoryBadge } from './CategoryBadge'
 import { UrgencyBadge } from './UrgencyBadge'
@@ -42,7 +42,7 @@ export function CaseCard({ case_, className }: Props) {
   const age            = caseAgeLabel(case_.created_at)
   const ageBorder      = caseAgeBorderClass(case_.created_at)
   const hasWhatsApp    = !!case_.client_phone
-  const expectedPast   = case_.expected_date && isPast(new Date(case_.expected_date))
+  const expectedPast   = case_.expected_date && isPast(parseLocalDate(case_.expected_date))
   const neverContacted = case_.call_count === 0 &&
     differenceInDays(new Date(), new Date(case_.created_at)) >= 1
 
@@ -88,7 +88,7 @@ export function CaseCard({ case_, className }: Props) {
           )}>
             <CalendarClock className="w-3 h-3" />
             {expectedPast ? 'Overdue: ' : 'Due: '}
-            {format(new Date(case_.expected_date), 'MMM d')}
+            {format(parseLocalDate(case_.expected_date), 'MMM d')}
           </div>
         )}
 

@@ -79,6 +79,9 @@ export default function RemindersPage() {
       },
     )
     return cleanup
+    // `markSent.mutateAsync` is a stable reference (TanStack Query v5); adding
+    // the whole `markSent` object would recreate the interval every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reminders])
 
   const upcoming = reminders.filter((r) => !r.sent && !isPast(new Date(r.remind_at)))

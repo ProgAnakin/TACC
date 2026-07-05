@@ -56,10 +56,16 @@ export function useCases(filters: CaseFilters = {}) {
         query = query.eq('urgency', filters.urgency)
       }
       if (filters.search) {
-        const term = `%${filters.search}%`
-        query = query.or(
-          `client_name.ilike.${term},client_phone.ilike.${term},shopify_order.ilike.${term},product_name.ilike.${term}`,
-        )
+        // Strip characters that break the PostgREST .or() grammar (comma
+        // separates clauses, parens group them) — otherwise a client name like
+        // "Rossi, Via Roma" produces a malformed filter or injects clauses.
+        const safe = filters.search.replace(/[,()\\]/g, ' ').trim()
+        if (safe) {
+          const term = `%${safe}%`
+          query = query.or(
+            `client_name.ilike.${term},client_phone.ilike.${term},shopify_order.ilike.${term},product_name.ilike.${term}`,
+          )
+        }
       }
 
       const { data, error } = await query.order('created_at', { ascending: false })

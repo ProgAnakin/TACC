@@ -27,7 +27,7 @@ import {
 import { useCase, useDeleteCase, useResolveCase, useUpdateCase } from '@/hooks/useCases'
 import { useCreateReminder } from '@/hooks/useReminders'
 import type { PdfLocale } from '@/lib/pdf'
-import { buildWhatsAppUrl, copyToClipboard, shortCaseId } from '@/lib/utils'
+import { buildWhatsAppUrl, copyToClipboard, shortCaseId, parseLocalDate } from '@/lib/utils'
 import { Textarea } from '@/components/ui/textarea'
 import type { ServiceStatus, LeadOutcome } from '@/types'
 import { LEAD_OUTCOME_LABELS, LEAD_OUTCOME_COLORS } from '@/types'
@@ -201,7 +201,7 @@ export default function CaseDetailPage() {
   const waUrl          = case_.client_phone
     ? buildWhatsAppUrl(case_.client_phone, case_.category, case_.client_name, case_.product_name)
     : null
-  const expectedPast   = case_.expected_date && isPast(new Date(case_.expected_date))
+  const expectedPast   = case_.expected_date && isPast(parseLocalDate(case_.expected_date))
   const causeLabel     = case_.category === 'problem' ? 'Complaint Details'
                        : case_.category === 'arrival' ? 'Details'
                        : 'Reason for Service'
@@ -379,7 +379,7 @@ export default function CaseDetailPage() {
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Expected Date</p>
               <p className={`flex items-center gap-2 text-sm font-medium ${expectedPast ? 'text-red-600' : 'text-gray-700'}`}>
                 <CalendarClock className="w-4 h-4" />
-                {format(new Date(case_.expected_date), 'MMMM d, yyyy')}
+                {format(parseLocalDate(case_.expected_date), 'MMMM d, yyyy')}
                 {expectedPast && <span className="text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full">Overdue</span>}
               </p>
             </div>

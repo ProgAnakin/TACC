@@ -14,7 +14,7 @@ import { usePullToRefresh } from '@/hooks/usePullToRefresh'
 import { IOSInstallCard } from '@/components/IOSInstallCard'
 import { toast } from 'sonner'
 import { Bell, Check } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn, parseLocalDate } from '@/lib/utils'
 import type { Category } from '@/types'
 import { CATEGORY_SHORT } from '@/types'
 
@@ -111,7 +111,7 @@ export default function HomePage() {
     const now = new Date()
     return allOpenCases.filter(c => {
       // Overdue service item (expected_date in the past)
-      if (c.expected_date && isPast(new Date(c.expected_date))) return true
+      if (c.expected_date && isPast(parseLocalDate(c.expected_date))) return true
       // Calculate days since last touch (last_contact_at or created_at)
       const lastTouch = c.last_contact_at ? new Date(c.last_contact_at) : new Date(c.created_at)
       const days = differenceInDays(now, lastTouch)
@@ -290,7 +290,7 @@ export default function HomePage() {
             </div>
             <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
               {attentionCases.map(c => {
-                const isOverdue = c.expected_date && isPast(new Date(c.expected_date))
+                const isOverdue = c.expected_date && isPast(parseLocalDate(c.expected_date))
                 const lastTouch = c.last_contact_at ? new Date(c.last_contact_at) : new Date(c.created_at)
                 const days = differenceInDays(new Date(), lastTouch)
                 const reason = isOverdue ? '⏰ Overdue return' : c.category === 'lead' ? '🎯 Follow-up due' : `📅 ${days}d no contact`

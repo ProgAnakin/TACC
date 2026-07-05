@@ -100,13 +100,24 @@ export function useStats(period: StatsPeriod) {
       }
       if (!user) return empty
 
-      const { data, error } = await supabase
-        .from('cases')
-        .select('*')
-        .eq('user_id', user.id)
-      if (error) throw error
+      // Supabase caps an unbounded select at 1000 rows. Stats aggregate the
+      // full history, so page through in 1000-row batches until exhausted —
+      // otherwise counts/revenue silently freeze once a shop passes 1000 cases.
+      const PAGE = 1000
+      const all: Case[] = []
+      for (let from = 0; ; from += PAGE) {
+        const { data, error } = await supabase
+          .from('cases')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .range(from, from + PAGE - 1)
+        if (error) throw error
+        const batch = (data ?? []) as Case[]
+        all.push(...batch)
+        if (batch.length < PAGE) break
+      }
 
-      const all      = (data ?? []) as Case[]
       const range    = periodRange(period)
       const prevRange = previousPeriodRange(period)
 

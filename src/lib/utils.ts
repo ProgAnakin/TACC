@@ -51,6 +51,16 @@ export function buildWhatsAppUrl(
   return `https://wa.me/${withCC}?text=${encodeURIComponent(messages[category])}`
 }
 
+/** Parse a value coming from `<input type="date">` ("YYYY-MM-DD") as LOCAL
+ *  midnight. `new Date("2026-07-10")` parses as UTC midnight, which renders and
+ *  compares as the previous day for users west of UTC — this avoids that. Full
+ *  timestamps fall through to the native parser. */
+export function parseLocalDate(value: string): Date {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value)
+  if (m) return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]))
+  return new Date(value)
+}
+
 /** Returns age-based Tailwind classes for the case card left border. */
 export function caseAgeBorderClass(createdAt: string): string {
   const days = Math.floor((Date.now() - new Date(createdAt).getTime()) / 86_400_000)
@@ -83,7 +93,10 @@ export function downloadCasesCSV(cases: Array<Record<string, unknown>>, filename
   ]
   const escape = (v: unknown) => {
     if (v == null) return ''
-    const s = String(v)
+    let s = String(v)
+    // Neutralize CSV/Excel formula injection: a value starting with = + - @
+    // (or a control char) is executed as a formula by spreadsheet apps.
+    if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`
     return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
   }
   const rows = [
@@ -106,7 +119,9 @@ export async function compressImage(
   maxDimension = 1280,
   quality = 0.8,
 ): Promise<Blob> {
-  const bitmap = await createImageBitmap(file)
+  // `imageOrientation: 'from-image'` applies the EXIF orientation so phone
+  // photos taken sideways aren't uploaded rotated 90° (iOS/Safari default varies).
+  const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' })
   let { width, height } = bitmap
   if (width > maxDimension || height > maxDimension) {
     const scale = maxDimension / Math.max(width, height)

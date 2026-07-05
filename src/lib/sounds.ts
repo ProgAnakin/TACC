@@ -36,7 +36,7 @@ export function playSound(type: SoundType): void {
 
   } else if (type === 'chime') {
     // C5 → E5 → G5 ascending arpeggio
-    ;[523, 659, 784].forEach((freq, i) => {
+    [523, 659, 784].forEach((freq, i) => {
       const osc  = ac.createOscillator()
       const gain = ac.createGain()
       osc.connect(gain)
@@ -52,7 +52,7 @@ export function playSound(type: SoundType): void {
     })
 
   } else if (type === 'triple') {
-    ;[0, 0.18, 0.36].forEach((delay) => {
+    [0, 0.18, 0.36].forEach((delay) => {
       const osc  = ac.createOscillator()
       const gain = ac.createGain()
       osc.connect(gain)

@@ -40,6 +40,10 @@ export function usePhotos(caseId: string | undefined) {
       return withUrls
     },
     enabled: !!caseId && !!user,
+    // Signed URLs live 1h; refresh a little before expiry so a case detail kept
+    // open (or served from cache) doesn't end up showing broken images.
+    staleTime: 55 * 60 * 1000,
+    refetchInterval: 55 * 60 * 1000,
   })
 }
 
@@ -82,9 +86,15 @@ export function useDeletePhoto() {
 
   return useMutation({
     mutationFn: async ({ photo }: { photo: CasePhoto; caseId: string }) => {
-      await supabase.storage.from(BUCKET).remove([photo.storage_path])
+      // Delete the DB row first: if this fails, the file is still referenced and
+      // reachable, so nothing is lost. Doing storage-first could leave a row
+      // pointing at a missing file (permanent broken image) if the row delete fails.
       const { error } = await supabase.from('case_photos').delete().eq('id', photo.id)
       if (error) throw error
+      // Row is gone; best-effort remove the file. A failure here only leaves an
+      // orphaned blob, not a broken UI — surface it to the console, don't throw.
+      const { error: storageError } = await supabase.storage.from(BUCKET).remove([photo.storage_path])
+      if (storageError) console.warn('Photo file not removed from storage:', storageError.message)
     },
     onSuccess: (_data, { caseId }) => {
       queryClient.invalidateQueries({ queryKey: ['photos', caseId] })

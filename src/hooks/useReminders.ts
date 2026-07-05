@@ -45,7 +45,7 @@ export function useUpcomingReminders() {
         .select('*, case:cases(client_name, product_name, category)')
         .eq('user_id', user.id)
         .eq('sent', false)
-        .gte('remind_at', now)
+        .gt('remind_at', now) // exclusive — a reminder exactly at `now` counts as due, not upcoming
         .order('remind_at', { ascending: true })
 
       if (error) throw error
