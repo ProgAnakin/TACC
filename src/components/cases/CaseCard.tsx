@@ -51,7 +51,7 @@ export function CaseCard({ case_, className }: Props) {
     : case_.call_count > 0 ? 'contacted' : null
 
   const waUrl = hasWhatsApp
-    ? buildWhatsAppUrl(case_.client_phone!, case_.category, case_.client_name, case_.product_name)
+    ? buildWhatsAppUrl(case_.client_phone!, case_.category, case_.client_name, case_.product_name, case_.client_country)
     : null
 
   return (

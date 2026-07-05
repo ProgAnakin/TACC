@@ -62,4 +62,17 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        // Split heavy, rarely-changing vendor code into its own long-cached
+        // chunks so the main bundle is smaller and updates invalidate less.
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'data-vendor': ['@tanstack/react-query', '@supabase/supabase-js'],
+          'form-vendor': ['react-hook-form', '@hookform/resolvers', 'zod'],
+        },
+      },
+    },
+  },
 })

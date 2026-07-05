@@ -10,9 +10,11 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { CountrySelect } from '@/components/ui/CountrySelect'
 import { useCase, useCreateCase, useUpdateCase } from '@/hooks/useCases'
 import { URGENCY_LABELS } from '@/types'
 import type { Category } from '@/types'
+import { DEFAULT_COUNTRY } from '@/lib/countries'
 
 /* ------------------------------------------------------------------ */
 /*  Category card config                                               */
@@ -63,8 +65,9 @@ const CATEGORY_CARDS: {
 /*  Form schema                                                        */
 /* ------------------------------------------------------------------ */
 const schema = z.object({
-  client_name:   z.string().min(2, 'Name required (min. 2 characters)'),
-  client_phone:  z.string().optional().or(z.literal('')),
+  client_name:    z.string().min(2, 'Name required (min. 2 characters)'),
+  client_country: z.string().optional().or(z.literal('')),
+  client_phone:   z.string().optional().or(z.literal('')),
   client_email:  z.string().email('Invalid email').optional().or(z.literal('')),
   shopify_order: z.string().optional().or(z.literal('')),
   product_name:  z.string().optional().or(z.literal('')),
@@ -108,21 +111,24 @@ export default function CaseFormPage() {
   } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      category:     prefill.category ?? 'arrival',
-      urgency:      'normal',
-      client_name:  prefill.client_name ?? '',
-      client_phone: prefill.client_phone ?? '',
+      category:       prefill.category ?? 'arrival',
+      urgency:        'normal',
+      client_name:    prefill.client_name ?? '',
+      client_phone:   prefill.client_phone ?? '',
+      client_country: DEFAULT_COUNTRY,
     },
   })
 
-  const watchedCategory = watch('category')
-  const watchedUrgency  = watch('urgency')
+  const watchedCategory  = watch('category')
+  const watchedUrgency   = watch('urgency')
   const watchedDealValue = watch('deal_value')
+  const watchedCountry   = watch('client_country')
 
   useEffect(() => {
     if (existingCase) {
       reset({
-        client_name:   existingCase.client_name,
+        client_name:    existingCase.client_name,
+        client_country: existingCase.client_country || DEFAULT_COUNTRY,
         client_phone:  existingCase.client_phone  || '',
         client_email:  existingCase.client_email  || '',
         shopify_order: existingCase.shopify_order || '',
@@ -156,6 +162,7 @@ export default function CaseFormPage() {
     // Extra columns added in migrations 002/003/004 — only include when they have a real value
     // so the insert still works on databases that haven't run those migrations yet.
     const extras: Record<string, unknown> = {}
+    if (data.client_country) extras.client_country = data.client_country
     if (data.expected_date) extras.expected_date = data.expected_date
     if (isEditing && existingCase?.service_status) extras.service_status = existingCase.service_status
     if (isEditing && existingCase?.last_contact_at) extras.last_contact_at = existingCase.last_contact_at
@@ -276,16 +283,24 @@ export default function CaseFormPage() {
 
           <div className="space-y-1.5">
             <Label htmlFor="client_phone">Phone / WhatsApp</Label>
-            <Input
-              id="client_phone"
-              type="tel"
-              placeholder="+39 333 1234567"
-              inputMode="tel"
-              autoCapitalize="off"
-              autoCorrect="off"
-              autoComplete="tel"
-              {...register('client_phone')}
-            />
+            <div className="flex gap-2">
+              <CountrySelect
+                value={watchedCountry}
+                onChange={(code) => setValue('client_country', code, { shouldDirty: true })}
+              />
+              <Input
+                id="client_phone"
+                type="tel"
+                placeholder="333 123 4567"
+                inputMode="tel"
+                autoCapitalize="off"
+                autoCorrect="off"
+                autoComplete="tel"
+                className="flex-1"
+                {...register('client_phone')}
+              />
+            </div>
+            <p className="text-xs text-gray-400">Pick the client's country so the number and WhatsApp link work anywhere.</p>
           </div>
 
           <div className="space-y-1.5">

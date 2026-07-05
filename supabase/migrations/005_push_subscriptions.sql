@@ -11,6 +11,7 @@ create table if not exists push_subscriptions (
 
 alter table push_subscriptions enable row level security;
 
+drop policy if exists "users manage own push subscriptions" on push_subscriptions;
 create policy "users manage own push subscriptions"
   on push_subscriptions for all
   using  (auth.uid() = user_id)

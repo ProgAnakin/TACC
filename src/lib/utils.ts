@@ -1,12 +1,16 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import { formatForCountry, toDialString } from './countries'
 import type { Category } from '@/types'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function formatPhone(phone: string): string {
+/** Display a phone number. When a country is known, format it as
+ *  "+39 333 123 4567"; otherwise fall back to the legacy Brazilian grouping. */
+export function formatPhone(phone: string, countryCode?: string | null): string {
+  if (countryCode) return formatForCountry(phone, countryCode)
   const d = phone.replace(/\D/g, '')
   if (d.length === 11) return `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`
   if (d.length === 10) return `(${d.slice(0,2)}) ${d.slice(2,6)}-${d.slice(6)}`
@@ -19,22 +23,22 @@ export function buildWhatsAppUrl(
   category: Category,
   clientName: string,
   productName: string | null,
+  countryCode?: string | null,
 ): string {
   const digits = phone.replace(/\D/g, '')
 
-  // Italian phone number detection
   let withCC: string
-  if (digits.startsWith('39') && digits.length === 12) {
-    // Already has Italian country code
+  if (countryCode) {
+    // Country explicitly chosen on the case — trust its dial code.
+    withCC = toDialString(phone, countryCode)
+  } else if (digits.startsWith('39') && digits.length === 12) {
+    // Legacy fallback (no country stored): Italian number detection.
     withCC = digits
   } else if (digits.length === 10 && digits.startsWith('3')) {
-    // Italian mobile (10 digits starting with 3) → prepend 39
     withCC = `39${digits}`
   } else if (digits.length === 11 && digits.startsWith('039')) {
-    // 039... format → convert to 39...
     withCC = `39${digits.slice(2)}`
   } else {
-    // User already included country code or unknown format
     withCC = digits
   }
 

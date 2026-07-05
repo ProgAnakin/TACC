@@ -199,7 +199,7 @@ export default function CaseDetailPage() {
 
   const isResolved     = case_.status === 'resolved'
   const waUrl          = case_.client_phone
-    ? buildWhatsAppUrl(case_.client_phone, case_.category, case_.client_name, case_.product_name)
+    ? buildWhatsAppUrl(case_.client_phone, case_.category, case_.client_name, case_.product_name, case_.client_country)
     : null
   const expectedPast   = case_.expected_date && isPast(parseLocalDate(case_.expected_date))
   const causeLabel     = case_.category === 'problem' ? 'Complaint Details'

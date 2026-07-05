@@ -28,6 +28,8 @@ export interface Case {
   lead_outcome: LeadOutcome | null
   /* Added via migration 004 */
   deal_value: number | null
+  /* Added via migration 008 — ISO 3166-1 alpha-2 country of the client's phone */
+  client_country: string | null
 }
 
 export interface CallLog {
