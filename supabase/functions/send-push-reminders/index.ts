@@ -7,15 +7,20 @@ const VAPID_PUBLIC_KEY  = Deno.env.get('VAPID_PUBLIC_KEY')!
 const VAPID_PRIVATE_KEY = Deno.env.get('VAPID_PRIVATE_KEY')!
 const VAPID_SUBJECT     = Deno.env.get('VAPID_SUBJECT') ?? 'mailto:admin@caderninho.app'
 const SERVICE_ROLE_KEY  = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+// Optional shared secret — set it as a function secret AND in the cron header
+// if the service-role key format ever mismatches (legacy JWT vs new sb_secret_).
+const CRON_SECRET       = Deno.env.get('CRON_SECRET')
 
 webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY)
 
 const supabase = createClient(Deno.env.get('SUPABASE_URL')!, SERVICE_ROLE_KEY)
 
 Deno.serve(async (req) => {
-  // Only accept requests from Supabase internal (pg_cron / dashboard)
-  const auth = req.headers.get('Authorization') ?? ''
-  if (auth !== `Bearer ${SERVICE_ROLE_KEY}`) {
+  // Only accept internal calls (pg_cron / dashboard). Accept the service-role
+  // key in either format, or the optional CRON_SECRET escape hatch.
+  const token = (req.headers.get('Authorization') ?? '').replace(/^Bearer\s+/i, '')
+  const authorized = token === SERVICE_ROLE_KEY || (!!CRON_SECRET && token === CRON_SECRET)
+  if (!authorized) {
     return new Response('Unauthorized', { status: 401 })
   }
 
