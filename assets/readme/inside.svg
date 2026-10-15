@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="470" viewBox="0 0 1200 470" role="img" aria-labelledby="t d">
+<title id="t">Inside Caderninho</title><desc id="d">15.6k lines of app code (React + TypeScript); 59 UI components (across 11 screens); 16 database migrations (tested on a real Postgres); 58 access rules (one company never sees another); 4 × 700 hand-written texts (English · Italian · Portuguese · Spanish); 549 automated checks (app · database · browser); 0.7 s to open 1,500 cases (on a phone 4× slower); 0 known vulnerabilities (in the published app)</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--bg1)"/><stop offset="1" stop-color="var(--bg2)"/></linearGradient>
+  <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="6" stdDeviation="9" flood-color="var(--shadow)"/></filter>
+</defs>
+<style>
+  svg { --bg1:#eef4ff; --bg2:#f6f0ff; --card:#ffffff; --tile:#f8fafc; --line:#e2e8f0; --ink:#0f172a; --ink2:#334155; --ink3:#64748b;
+        --accent:#2563eb; --accentSoft:#dbeafe; --wa:#15803d; --waSoft:#dcfce7; --red:#dc2626; --redSoft:#fee2e2;
+        --green:#15803d; --greenSoft:#dcfce7; --violet:#7c3aed; --violetSoft:#ede9fe; --amber:#b45309; --amberSoft:#fef3c7;
+        --sky:#0369a1; --skySoft:#e0f2fe; --teal:#0f766e; --tealSoft:#ccfbf1; --shadow:rgba(30,41,90,.16); --onAccent:#ffffff; }
+  @media (prefers-color-scheme: dark) {
+    svg { --bg1:#0b1220; --bg2:#161b30; --card:#111827; --tile:#0f172a; --line:#273244; --ink:#f1f5f9; --ink2:#cbd5e1; --ink3:#94a3b8;
+          --accent:#60a5fa; --accentSoft:#1e3a8a; --wa:#4ade80; --waSoft:#14532d; --red:#f87171; --redSoft:#4c1d1d;
+          --green:#4ade80; --greenSoft:#14532d; --violet:#a78bfa; --violetSoft:#3b2a6b; --amber:#fbbf24; --amberSoft:#4a3510;
+          --sky:#7dd3fc; --skySoft:#0c3a5a; --teal:#5eead4; --tealSoft:#134e4a; --shadow:rgba(0,0,0,.45); --onAccent:#0b1220; }
+  }
+  text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif; }
+  .ic { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .ink { fill: var(--ink); } .ink2 { fill: var(--ink2); } .ink3 { fill: var(--ink3); } .accent { fill: var(--accent); }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+    .tile { animation: up .7s cubic-bezier(.2,.8,.2,1) both; }
+    @keyframes up { from { opacity: 0; transform: translateY(14px) } to { opacity: 1; transform: none } }</style>
+<rect width="1200" height="470" rx="24" fill="url(#bg)"/>
+
+  <text x="50" y="62" class="ink" font-size="26" font-weight="800">Inside Caderninho</text>
+  <text x="50" y="90" class="ink3" font-size="15.5">A real product, tested on every change</text>
+  <g transform="translate(50 112)"><g class="tile" style="animation-delay:0.00s">
+      <rect width="260" height="150" rx="16" fill="var(--card)" stroke="var(--line)"/>
+      <g transform="translate(20 20) scale(0.9166666666666666)" class="ic " style="color:var(--accent)"><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></g>
+      <text x="20" y="88" class="ink" font-size="38" font-weight="800" letter-spacing="-.5">15.6k</text>
+      <text x="20" y="114" class="ink2" font-size="15" font-weight="600">lines of app code</text>
+      <text x="20" y="134" class="ink3" font-size="12.5">React + TypeScript</text>
+    </g></g><g transform="translate(330 112)"><g class="tile" style="animation-delay:0.08s">
+      <rect width="260" height="150" rx="16" fill="var(--card)" stroke="var(--line)"/>
+      <g transform="translate(20 20) scale(0.9166666666666666)" class="ic " style="color:var(--accent)"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></g>
+      <text x="20" y="88" class="ink" font-size="38" font-weight="800" letter-spacing="-.5">59</text>
+      <text x="20" y="114" class="ink2" font-size="15" font-weight="600">UI components</text>
+      <text x="20" y="134" class="ink3" font-size="12.5">across 11 screens</text>
+    </g></g><g transform="translate(610 112)"><g class="tile" style="animation-delay:0.16s">
+      <rect width="260" height="150" rx="16" fill="var(--card)" stroke="var(--line)"/>
+      <g transform="translate(20 20) scale(0.9166666666666666)" class="ic " style="color:var(--accent)"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></g>
+      <text x="20" y="88" class="ink" font-size="38" font-weight="800" letter-spacing="-.5">16</text>
+      <text x="20" y="114" class="ink2" font-size="15" font-weight="600">database migrations</text>
+      <text x="20" y="134" class="ink3" font-size="12.5">tested on a real Postgres</text>
+    </g></g><g transform="translate(890 112)"><g class="tile" style="animation-delay:0.24s">
+      <rect width="260" height="150" rx="16" fill="var(--card)" stroke="var(--line)"/>
+      <g transform="translate(20 20) scale(0.9166666666666666)" class="ic " style="color:var(--accent)"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></g>
+      <text x="20" y="88" class="ink" font-size="38" font-weight="800" letter-spacing="-.5">58</text>
+      <text x="20" y="114" class="ink2" font-size="15" font-weight="600">access rules</text>
+      <text x="20" y="134" class="ink3" font-size="12.5">one company never sees another</text>
+    </g></g><g transform="translate(50 282)"><g class="tile" style="animation-delay:0.32s">
+      <rect width="260" height="150" rx="16" fill="var(--card)" stroke="var(--line)"/>
+      <g transform="translate(20 20) scale(0.9166666666666666)" class="ic " style="color:var(--accent)"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></g>
+      <text x="20" y="88" class="ink" font-size="38" font-weight="800" letter-spacing="-.5">4 × 700</text>
+      <text x="20" y="114" class="ink2" font-size="15" font-weight="600">hand-written texts</text>
+      <text x="20" y="134" class="ink3" font-size="12.5">English · Italian · Portuguese · Spanish</text>
+    </g></g><g transform="translate(330 282)"><g class="tile" style="animation-delay:0.40s">
+      <rect width="260" height="150" rx="16" fill="var(--card)" stroke="var(--line)"/>
+      <g transform="translate(20 20) scale(0.9166666666666666)" class="ic " style="color:var(--accent)"><path d="M14.5 2v17.5c0 1.4-1.1 2.5-2.5 2.5h0c-1.4 0-2.5-1.1-2.5-2.5V2"/><path d="M8.5 2h7"/><path d="M14.5 16h-5"/></g>
+      <text x="20" y="88" class="ink" font-size="38" font-weight="800" letter-spacing="-.5">549</text>
+      <text x="20" y="114" class="ink2" font-size="15" font-weight="600">automated checks</text>
+      <text x="20" y="134" class="ink3" font-size="12.5">app · database · browser</text>
+    </g></g><g transform="translate(610 282)"><g class="tile" style="animation-delay:0.48s">
+      <rect width="260" height="150" rx="16" fill="var(--card)" stroke="var(--line)"/>
+      <g transform="translate(20 20) scale(0.9166666666666666)" class="ic " style="color:var(--accent)"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></g>
+      <text x="20" y="88" class="ink" font-size="38" font-weight="800" letter-spacing="-.5">0.7 s</text>
+      <text x="20" y="114" class="ink2" font-size="15" font-weight="600">to open 1,500 cases</text>
+      <text x="20" y="134" class="ink3" font-size="12.5">on a phone 4× slower</text>
+    </g></g><g transform="translate(890 282)"><g class="tile" style="animation-delay:0.56s">
+      <rect width="260" height="150" rx="16" fill="var(--card)" stroke="var(--line)"/>
+      <g transform="translate(20 20) scale(0.9166666666666666)" class="ic " style="color:var(--accent)"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></g>
+      <text x="20" y="88" class="ink" font-size="38" font-weight="800" letter-spacing="-.5">0</text>
+      <text x="20" y="114" class="ink2" font-size="15" font-weight="600">known vulnerabilities</text>
+      <text x="20" y="134" class="ink3" font-size="12.5">in the published app</text>
+    </g></g>
+</svg>

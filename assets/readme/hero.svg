@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="470" viewBox="0 0 1200 470" role="img" aria-labelledby="t d">
+<title id="t">Caderninho Digital</title><desc id="d">The shop counter notebook, now smart: the list of cases with what needs attention, a reminder at the right time and a WhatsApp message ready in the client’s language.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--bg1)"/><stop offset="1" stop-color="var(--bg2)"/></linearGradient>
+  <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="6" stdDeviation="9" flood-color="var(--shadow)"/></filter>
+</defs>
+<style>
+  svg { --bg1:#eef4ff; --bg2:#f6f0ff; --card:#ffffff; --tile:#f8fafc; --line:#e2e8f0; --ink:#0f172a; --ink2:#334155; --ink3:#64748b;
+        --accent:#2563eb; --accentSoft:#dbeafe; --wa:#15803d; --waSoft:#dcfce7; --red:#dc2626; --redSoft:#fee2e2;
+        --green:#15803d; --greenSoft:#dcfce7; --violet:#7c3aed; --violetSoft:#ede9fe; --amber:#b45309; --amberSoft:#fef3c7;
+        --sky:#0369a1; --skySoft:#e0f2fe; --teal:#0f766e; --tealSoft:#ccfbf1; --shadow:rgba(30,41,90,.16); --onAccent:#ffffff; }
+  @media (prefers-color-scheme: dark) {
+    svg { --bg1:#0b1220; --bg2:#161b30; --card:#111827; --tile:#0f172a; --line:#273244; --ink:#f1f5f9; --ink2:#cbd5e1; --ink3:#94a3b8;
+          --accent:#60a5fa; --accentSoft:#1e3a8a; --wa:#4ade80; --waSoft:#14532d; --red:#f87171; --redSoft:#4c1d1d;
+          --green:#4ade80; --greenSoft:#14532d; --violet:#a78bfa; --violetSoft:#3b2a6b; --amber:#fbbf24; --amberSoft:#4a3510;
+          --sky:#7dd3fc; --skySoft:#0c3a5a; --teal:#5eead4; --tealSoft:#134e4a; --shadow:rgba(0,0,0,.45); --onAccent:#0b1220; }
+  }
+  text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif; }
+  .ic { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .ink { fill: var(--ink); } .ink2 { fill: var(--ink2); } .ink3 { fill: var(--ink3); } .accent { fill: var(--accent); }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+    .in { animation: rise 10s cubic-bezier(.2,.8,.2,1) infinite both; }
+    .d1 { animation-delay: .2s } .d2 { animation-delay: .55s } .d3 { animation-delay: .9s } .d4 { animation-delay: 1.9s } .d5 { animation-delay: 3.3s }
+    @keyframes rise { 0% { opacity: 0; transform: translateY(16px) } 6% { opacity: 1; transform: none } 86% { opacity: 1; transform: none } 94%, 100% { opacity: 0; transform: translateY(-8px) } }
+    .drop { animation: drop 10s cubic-bezier(.2,.8,.2,1) infinite both; animation-delay: 1.9s }
+    @keyframes drop { 0% { opacity: 0; transform: translateY(-22px) } 6% { opacity: 1; transform: none } 86% { opacity: 1; transform: none } 94%, 100% { opacity: 0; transform: translateY(-12px) } }
+    .ring { transform-box: fill-box; transform-origin: 50% 15%; animation: ring 10s ease-in-out infinite; animation-delay: 2.2s }
+    @keyframes ring { 0%, 9%, 100% { transform: rotate(0) } 1.5% { transform: rotate(14deg) } 3% { transform: rotate(-12deg) } 4.5% { transform: rotate(9deg) } 6% { transform: rotate(-6deg) } 7.5% { transform: rotate(3deg) } }
+    .pop { transform-box: fill-box; transform-origin: 10% 100%; animation: pop 10s cubic-bezier(.2,.9,.3,1.3) infinite both; animation-delay: 3.3s }
+    @keyframes pop { 0% { opacity: 0; transform: scale(.85) } 5% { opacity: 1; transform: none } 84% { opacity: 1; transform: none } 92%, 100% { opacity: 0; transform: scale(.95) } }
+    .blink { animation: blink 2s ease-in-out infinite }
+    @keyframes blink { 0%, 100% { opacity: 1 } 50% { opacity: .45 } }</style>
+<rect width="1200" height="470" rx="24" fill="url(#bg)"/>
+
+  <g transform="translate(56 58)">
+    <rect width="54" height="54" rx="14" fill="var(--accent)"/>
+    <g transform="translate(13 13) scale(1.1666666666666667)" class="ic " style="color:var(--onAccent)"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></g>
+  </g>
+  <text x="56" y="168" class="ink" font-size="50" font-weight="800" letter-spacing="-1">Caderninho Digital</text>
+  <text x="56" y="212" class="accent" font-size="24" font-weight="700">The shop counter notebook, now smart.</text>
+  <text x="56" y="256" class="ink2" font-size="18">Every customer waiting on a part, a repair or an answer</text>
+  <text x="56" y="282" class="ink2" font-size="18">becomes a case with a next step, a reminder on time</text>
+  <text x="56" y="308" class="ink2" font-size="18">and a WhatsApp message ready in their language.</text>
+  <g transform="translate(56 352)"><rect width="136.2" height="38" rx="19" fill="var(--card)" stroke="var(--line)"/><g transform="translate(14 10) scale(0.75)" class="ic " style="color:var(--accent)"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></g><text x="40" y="24.5" font-size="15" font-weight="600" class="ink2">4 languages</text></g><g transform="translate(202.2 352)"><rect width="218.2" height="38" rx="19" fill="var(--card)" stroke="var(--line)"/><g transform="translate(14 10) scale(0.75)" class="ic " style="color:var(--accent)"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2v0a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12v0a2 2 0 0 1-2-2V7"/></g><text x="40" y="24.5" font-size="15" font-weight="600" class="ink2">Many stores, one team</text></g><g transform="translate(430.4 352)"><rect width="201.79999999999998" height="38" rx="19" fill="var(--card)" stroke="var(--line)"/><g transform="translate(14 10) scale(0.75)" class="ic " style="color:var(--accent)"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><line x1="12" x2="12.01" y1="18" y2="18"/></g><text x="40" y="24.5" font-size="15" font-weight="600" class="ink2">iPad, Mac and phone</text></g>
+
+  <g transform="translate(676 104)"><g class="in d1"><g transform="translate(0 0)">
+    <rect width="468" height="76" rx="14" fill="var(--card)" filter="url(#shadow)"/>
+    <rect x="14" y="14" width="40" height="40" rx="10" style="fill:var(--redSoft)"/>
+    <g transform="translate(24 24) scale(0.8333333333333334)" class="ic " style="color:var(--red)"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M12 7v2"/><path d="M12 13h.01"/></g>
+    <text x="68" y="31" class="ink" font-size="16" font-weight="700">Luca Ricci</text>
+    <rect x="155.6" y="17" width="54.2" height="20" rx="6" style="fill:var(--redSoft)"/><text x="162.6" y="31" font-size="12" font-weight="600" style="fill:var(--red)">Critical</text>
+    <text x="68" y="49" class="ink3" font-size="13">Lavapavimenti senza fili</text>
+    <g transform="translate(68 56) scale(0.5416666666666666)" class="ic " style="color:var(--red)"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></g>
+    <text x="86" y="67" font-size="13" font-weight="600" style="fill:var(--red)">Urgent — contact the client today</text>
+    <g transform="translate(392 28) scale(0.8333333333333334)" class="ic " style="color:var(--ink2)"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></g>
+    <g transform="translate(428 28) scale(0.8333333333333334)" class="ic " style="color:var(--wa)"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></g>
+  </g></g></g>
+  <g transform="translate(676 194)"><g class="in d2"><g transform="translate(0 0)">
+    <rect width="468" height="76" rx="14" fill="var(--card)" filter="url(#shadow)"/>
+    <rect x="14" y="14" width="40" height="40" rx="10" style="fill:var(--skySoft)"/>
+    <g transform="translate(24 24) scale(0.8333333333333334)" class="ic " style="color:var(--sky)"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></g>
+    <text x="68" y="31" class="ink" font-size="16" font-weight="700">Giulia Romano</text>
+    
+    <text x="68" y="49" class="ink3" font-size="13">Asciugacapelli ionico</text>
+    <g transform="translate(68 56) scale(0.5416666666666666)" class="ic " style="color:var(--green)"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></g>
+    <text x="86" y="67" font-size="13" font-weight="600" style="fill:var(--green)">Ready for pickup — tell the client</text>
+    <g transform="translate(392 28) scale(0.8333333333333334)" class="ic " style="color:var(--ink2)"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></g>
+    <g transform="translate(428 28) scale(0.8333333333333334)" class="ic " style="color:var(--wa)"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></g>
+  </g></g></g>
+  <g transform="translate(676 284)"><g class="in d3"><g transform="translate(0 0)">
+    <rect width="468" height="76" rx="14" fill="var(--card)" filter="url(#shadow)"/>
+    <rect x="14" y="14" width="40" height="40" rx="10" style="fill:var(--violetSoft)"/>
+    <g transform="translate(24 24) scale(0.8333333333333334)" class="ic " style="color:var(--violet)"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></g>
+    <text x="68" y="31" class="ink" font-size="16" font-weight="700">Francesca Esposito</text>
+    
+    <text x="68" y="49" class="ink3" font-size="13">Purificatore d'acqua R9</text>
+    <g transform="translate(68 56) scale(0.5416666666666666)" class="ic " style="color:var(--amber)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></g>
+    <text x="86" y="67" font-size="13" font-weight="600" style="fill:var(--amber)">Follow-up due · 4 days</text>
+    <g transform="translate(392 28) scale(0.8333333333333334)" class="ic " style="color:var(--ink2)"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></g>
+    <g transform="translate(428 28) scale(0.8333333333333334)" class="ic " style="color:var(--wa)"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></g>
+  </g></g></g>
+
+  <g transform="translate(808 22)"><g class="drop">
+    <rect width="356" height="96" rx="16" fill="var(--card)" filter="url(#shadow)"/>
+    <rect x="14" y="16" width="38" height="38" rx="10" style="fill:var(--amberSoft)"/>
+    <g class="ring"><g transform="translate(23 25) scale(0.8333333333333334)" class="ic " style="color:var(--amber)"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/><path d="M4 2C2.8 3.7 2 5.7 2 8"/><path d="M22 8c0-2.3-.8-4.3-2-6"/></g></g>
+    <text x="64" y="30" class="ink3" font-size="11" font-weight="700" letter-spacing=".6">REMINDER · 10:30</text>
+    <text x="64" y="50" class="ink" font-size="15" font-weight="700">Call Marco: has the part arrived?</text>
+    <rect x="64" y="60" width="86" height="26" rx="8" fill="var(--accent)"/><text x="107" y="77.5" font-size="12.5" font-weight="700" text-anchor="middle" style="fill:var(--onAccent)">Done</text>
+    <rect x="158" y="60" width="70" height="26" rx="8" fill="var(--card)" stroke="var(--line)"/><text x="193" y="77.5" font-size="12.5" font-weight="600" class="ink2" text-anchor="middle">Later</text>
+    <rect x="236" y="60" width="64" height="26" rx="8" fill="var(--card)" stroke="var(--line)"/><text x="268" y="77.5" font-size="12.5" font-weight="600" class="ink2" text-anchor="middle">Open</text>
+  </g></g>
+
+  <g transform="translate(742 380)"><g class="pop">
+    <rect width="402" height="70" rx="16" style="fill:var(--waSoft)"/>
+    <g transform="translate(14 14) scale(0.8333333333333334)" class="ic " style="color:var(--wa)"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></g>
+    <text x="44" y="30" class="ink" font-size="13.5">Buongiorno Luca, abbiamo ricevuto la tua</text>
+    <text x="44" y="50" class="ink" font-size="13.5">segnalazione e ci stiamo già lavorando. — Carla</text>
+    <rect x="354" y="10" width="36" height="20" rx="6" fill="var(--card)"/><text x="372" y="24.5" font-size="11" font-weight="700" text-anchor="middle" style="fill:var(--wa)">IT</text>
+  </g></g>
+</svg>
