@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Caderninho Digital</title>
+  <meta name="description" content="The counter notebook for shops that repair, order and follow up: one list of every customer who is waiting, the next step for each, reminders on time and WhatsApp messages in the client's language.">
+  <meta name="theme-color" content="#f6f8fc" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b111d" media="(prefers-color-scheme: dark)">
+  <meta property="og:title" content="Caderninho Digital">
+  <meta property="og:description" content="Every customer who is waiting on your shop, in one list that tells you what to do next.">
+  <meta property="og:image" content="assets/media/tour-poster.jpg">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="assets/fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/instrument-sans.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+  <script src="config.js" defer></script>
+  <script src="main.js" defer></script>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap top-row">
+    <a class="brand" href="#top" aria-label="Caderninho Digital, back to top">
+      <span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
+      <span class="brand-name">Caderninho<span class="brand-dim"> Digital</span></span>
+    </a>
+    <nav class="top-nav" aria-label="Sections">
+      <a href="#how">How it works</a>
+      <a href="#features">Features</a>
+      <a href="#teams">Teams</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <a class="btn btn-solid btn-small" href="#demo">Request a demo</a>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- Hero: a page of the counter notebook, with the app on it -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">For shops that repair, order and follow up</p>
+        <h1>Every customer who is waiting on you, in one list that tells you what to do next.</h1>
+        <p class="lede">Caderninho turns the notebook behind your counter into cases with a next step, reminders at the right moment and WhatsApp messages ready in your client’s language. On the iPad, the Mac and your phone.</p>
+        <div class="hero-actions">
+          <a class="btn btn-solid" href="#demo">Request a demo</a>
+          <button class="btn btn-ghost" type="button" id="play-tour-hero" aria-controls="tour-video">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>
+            Watch the 50-second tour
+          </button>
+        </div>
+        <ul class="hero-facts" aria-label="At a glance">
+          <li>Works next to your till</li>
+          <li>Nothing for clients to install</li>
+          <li>English · Italiano · Português · Español</li>
+        </ul>
+      </div>
+      <figure class="hero-device">
+        <video class="autoplay" muted loop playsinline preload="metadata" poster="assets/media/dia-a-dia.jpg" width="440" height="860" aria-label="The app on an iPhone: the list of cases, an urgent complaint, and a WhatsApp message written in Italian">
+          <source src="assets/media/dia-a-dia.mp4" type="video/mp4">
+        </video>
+        <span class="note note-a" aria-hidden="true">urgent → call today!</span>
+        <span class="note note-b" aria-hidden="true">message already in Italian ✓</span>
+      </figure>
+    </div>
+  </section>
+
+  <!-- The problem, as it looks on paper -->
+  <section class="pains" aria-labelledby="pains-title">
+    <div class="wrap">
+      <h2 id="pains-title" class="section-title">Sound familiar?</h2>
+      <div class="pain-row">
+        <article class="slip"><p class="slip-date">Tue</p><p>The part came in three days ago. Nobody told Mrs Rossi.</p></article>
+        <article class="slip"><p class="slip-date">Thu</p><p>A customer asked for a price on the coffee machine. No one called back.</p></article>
+        <article class="slip"><p class="slip-date">Mon</p><p>The vacuum has been at the service centre for three weeks. The client keeps calling.</p></article>
+      </div>
+      <p class="pain-answer">Caderninho keeps track, so nobody waits in silence and no sale is forgotten.</p>
+    </div>
+  </section>
+
+  <!-- How a case moves: a real sequence, so it is numbered -->
+  <section id="how" class="how" aria-labelledby="how-title">
+    <div class="wrap">
+      <p class="eyebrow">How it works</p>
+      <h2 id="how-title" class="section-title">From the counter to the after-sale call</h2>
+      <ol class="journey">
+        <li><span class="step-n">1</span><h3>The customer comes in</h3><p>A special order, a repair, someone interested in a product or a complaint.</p></li>
+        <li><span class="step-n">2</span><h3>A case in seconds</h3><p>Pick the type and a ready-made template, type the name and phone. Done.</p></li>
+        <li><span class="step-n">3</span><h3>The app remembers</h3><p>Follow-ups are planned for you, at the client’s best time of day.</p></li>
+        <li><span class="step-n">4</span><h3>The message is ready</h3><p>In the client’s language, formal or informal, sent from your own WhatsApp.</p></li>
+        <li><span class="step-n">5</span><h3>Case closed</h3><p>Sale, pickup or solution. A check-in call is set for seven days later.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- Features, each shown in the real app -->
+  <section id="features" class="features" aria-labelledby="features-title">
+    <div class="wrap">
+      <p class="eyebrow">Features</p>
+      <h2 id="features-title" class="section-title">Built for the counter, not for an office</h2>
+
+      <article class="feature">
+        <div class="feature-media">
+          <video class="autoplay" muted loop playsinline preload="metadata" poster="assets/media/novo-caso.jpg" width="440" height="860" aria-label="Creating a repair case: type, template, name and phone; three follow-up reminders are set">
+            <source src="assets/media/novo-caso.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="feature-copy">
+          <h3>A new case while the client is still at the counter</h3>
+          <p>Four types cover what shops deal with every day: special orders, repairs, sales leads and complaints. Rename them with your shop’s own words, or turn off what you don’t use.</p>
+          <ul class="ticks">
+            <li>12 ready-made templates per type fill in urgency, details and the expected date</li>
+            <li>Follow-ups planned automatically: a repair after 5, 10 and 15 days, a lead after 2, 7 and 30</li>
+            <li>Photos, voice notes and dictation for the details</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="feature feature-wide">
+        <div class="feature-media">
+          <video class="autoplay" muted loop playsinline preload="metadata" poster="assets/media/ipad.jpg" width="900" height="660" aria-label="On the iPad: a reminder slides in, is snoozed for one hour, and the list and the case sit side by side">
+            <source src="assets/media/ipad.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="feature-copy">
+          <h3>Reminders that don’t slip</h3>
+          <p>When it’s time to call, the alert shows up on screen: mark it done, snooze it, or open the case. With the app closed, it arrives as a notification.</p>
+          <ul class="ticks">
+            <li>“Needs attention” comes first, with the reason: ready for pickup, overdue, follow-up due</li>
+            <li>List and case side by side on the iPad and the Mac</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="feature">
+        <div class="feature-media">
+          <video class="autoplay" muted loop playsinline preload="metadata" poster="assets/media/arrastar.jpg" width="440" height="860" aria-label="Swiping a case to the right resolves it, with an Undo button">
+            <source src="assets/media/arrastar.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="feature-copy">
+          <h3>Close the loop with one swipe</h3>
+          <p>Swipe right to resolve, left to delete. A lead closes as won, with the sale value, or lost, with the reason. Everything can be undone.</p>
+          <ul class="ticks">
+            <li>“Product arrived” and “Picked up” buttons for special orders</li>
+            <li>Repair stages with your own names, from “sent” to “delivered”</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="feature feature-wide">
+        <div class="feature-media">
+          <video class="autoplay" muted loop playsinline preload="metadata" poster="assets/media/metricas.jpg" width="900" height="660" aria-label="The shop's stats on the iPad: new and resolved cases, lead conversion, sales, repair time and where clients come from">
+            <source src="assets/media/metricas.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="feature-copy">
+          <h3>Your shop in numbers</h3>
+          <p>See what happened this week, this month or ever, compared with the period before. Per store, or just your own cases.</p>
+          <ul class="ticks">
+            <li>Lead conversion and sales from converted leads</li>
+            <li>Repair time, measured until the item is ready</li>
+            <li>Where clients come from and why leads are lost</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="feature">
+        <div class="feature-media">
+          <video class="autoplay" muted loop playsinline preload="metadata" poster="assets/media/idiomas.jpg" width="440" height="860" aria-label="The same screen in English, Italian, Portuguese and Spanish">
+            <source src="assets/media/idiomas.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="feature-copy">
+          <h3>Your language, and your client’s</h3>
+          <p>Each person uses the app in English, Italian, Portuguese or Spanish. Messages go out in the client’s language, worked out from the phone number or chosen on the case.</p>
+          <ul class="ticks">
+            <li>Every text written by hand, not machine-translated</li>
+            <li>Formal or informal: tu or Lei, tú or usted</li>
+            <li>Your company’s own message texts, signed by whoever sends them</li>
+          </ul>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- Teams and stores -->
+  <section id="teams" class="teams" aria-labelledby="teams-title">
+    <div class="wrap teams-grid">
+      <div>
+        <p class="eyebrow">Teams</p>
+        <h2 id="teams-title" class="section-title">One company, several stores, one team</h2>
+        <p class="lede">Everyone in a store works on the same cases. Each case has a person responsible, who gets its reminders. When someone leaves, their open cases are handed to a colleague.</p>
+      </div>
+      <dl class="roles">
+        <div class="role"><dt>Owner</dt><dd>Everything, including roles and company settings.</dd></div>
+        <div class="role"><dt>Manager</dt><dd>All stores. Invites and organises the consultants.</dd></div>
+        <div class="role"><dt>Consultant</dt><dd>The stores they were added to, and the cases there.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- Under the hood -->
+  <section class="trust" aria-labelledby="trust-title">
+    <div class="wrap">
+      <p class="eyebrow">Under the hood</p>
+      <h2 id="trust-title" class="section-title">Built like a real product</h2>
+      <div class="figures">
+        <div class="figure"><p class="figure-n">549</p><p class="figure-l">automated checks run on every change</p></div>
+        <div class="figure"><p class="figure-n">58</p><p class="figure-l">access rules in the database: one company never sees another</p></div>
+        <div class="figure"><p class="figure-n">1.3 ms</p><p class="figure-l">server time to open the list of a store with 1,500 cases</p></div>
+        <div class="figure"><p class="figure-n">0</p><p class="figure-l">known vulnerabilities in the published app</p></div>
+      </div>
+      <ul class="trust-list">
+        <li><strong>Private by design.</strong> Sign-in by invitation, optional two-step login, every company’s data kept apart by the database itself.</li>
+        <li><strong>Only what’s needed.</strong> Name, phone, optional e-mail, product and notes. No addresses, no payment details.</li>
+        <li><strong>GDPR-minded.</strong> A record of the client’s consent for offers, and photos and voice notes in private storage.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- The tour -->
+  <section class="tour" aria-labelledby="tour-title">
+    <div class="wrap">
+      <h2 id="tour-title" class="section-title">See it in 50 seconds</h2>
+      <div class="tour-frame">
+        <video id="tour-video" controls playsinline preload="none" poster="assets/media/tour-poster.jpg" width="1280" height="720" aria-label="Tour of Caderninho Digital">
+          <source src="assets/media/tour.mp4" type="video/mp4">
+        </video>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing: kept simple until the plans are final -->
+  <section class="pricing" aria-labelledby="pricing-title">
+    <div class="wrap pricing-row">
+      <div>
+        <h2 id="pricing-title" class="section-title">One simple monthly plan per store</h2>
+        <p class="lede">We are setting up the first shops personally. Ask for a demo and we will send you the current plans.</p>
+      </div>
+      <a class="btn btn-solid" href="#demo">Request a demo</a>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="faq" aria-labelledby="faq-title">
+    <div class="wrap">
+      <h2 id="faq-title" class="section-title">Questions shops ask</h2>
+      <div class="faq-list">
+        <details><summary>Does it replace my till or invoicing software?</summary><p>No. Caderninho sits next to them and takes care of what they don’t: the customers who are waiting, the follow-ups and the messages.</p></details>
+        <details><summary>Do my clients need to install anything?</summary><p>No. Messages open in your own WhatsApp, already written, and you send them as usual.</p></details>
+        <details><summary>Which devices does it run on?</summary><p>iPad, Mac, iPhone, Android and any computer with a recent browser. Install it on the home screen and it works like an app.</p></details>
+        <details><summary>Can I use my shop’s own words?</summary><p>Yes. Rename the case types and the repair stages, turn off what you don’t use, and write the company’s own message texts.</p></details>
+        <details><summary>Which languages?</summary><p>The app speaks English, Italian, Portuguese and Spanish. Each person picks theirs, and messages go out in the client’s.</p></details>
+        <details><summary>Is our data safe?</summary><p>Each company’s data is separated by the database itself, sign-in is by invitation and two-step login is available. The app stores no addresses and no payment details.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="demo" class="demo" aria-labelledby="demo-title">
+    <div class="wrap demo-grid">
+      <div class="demo-copy">
+        <p class="eyebrow">Request a demo</p>
+        <h2 id="demo-title" class="section-title">Tell us about your shop</h2>
+        <p class="lede">We’ll get back to you by e-mail or WhatsApp, in English, Italian, Portuguese or Spanish.</p>
+        <p class="direct">Prefer e-mail? Write to <a class="contact-email" href="#demo"><span data-contact-email>our address</span></a>.</p>
+      </div>
+      <form class="demo-form" id="demo-form" novalidate>
+        <div class="field">
+          <label for="f-name">Your name</label>
+          <input id="f-name" name="name" type="text" autocomplete="name" required>
+        </div>
+        <div class="field">
+          <label for="f-shop">Shop name and city</label>
+          <input id="f-shop" name="shop" type="text" autocomplete="organization" required placeholder="e.g. Casa Rossi, Milan">
+        </div>
+        <div class="field">
+          <label for="f-email">E-mail</label>
+          <input id="f-email" name="email" type="email" autocomplete="email" required>
+        </div>
+        <div class="field">
+          <label for="f-whatsapp">WhatsApp <span class="optional">(optional)</span></label>
+          <input id="f-whatsapp" name="whatsapp" type="tel" autocomplete="tel" placeholder="+39 …">
+        </div>
+        <fieldset class="field">
+          <legend>Reply by</legend>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="reply_by" value="E-mail" id="f-reply-email" checked> E-mail</label>
+            <label class="choice"><input type="radio" name="reply_by" value="WhatsApp" id="f-reply-whatsapp"> WhatsApp</label>
+          </div>
+        </fieldset>
+        <div class="field">
+          <label for="f-language">Language for our reply</label>
+          <select id="f-language" name="language">
+            <option>English</option>
+            <option>Italiano</option>
+            <option>Português</option>
+            <option>Español</option>
+          </select>
+        </div>
+        <div class="field field-full">
+          <label for="f-message">What would you like Caderninho to help with?</label>
+          <textarea id="f-message" name="message" rows="4" placeholder="e.g. We have two stores and track repairs on paper."></textarea>
+        </div>
+        <p class="form-note field-full">We use these details only to answer you. <a href="privacy.html">Privacy</a></p>
+        <div class="form-actions field-full">
+          <button class="btn btn-solid" type="submit" id="f-submit">Send request</button>
+          <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-row">
+    <p>© <span data-year>2026</span> Caderninho Digital</p>
+    <p><a href="privacy.html">Privacy</a></p>
+  </div>
+</footer>
+
+</body>
+</html>
